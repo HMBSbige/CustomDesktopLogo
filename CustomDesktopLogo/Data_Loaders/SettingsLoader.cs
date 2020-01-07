@@ -55,12 +55,6 @@ namespace SettingsLoader
         /// <param name="FilePath">System path to the .ini file to where the global settings are stored.</param>        
         public SettingsLoader(String FilePath)
         {
-            if (!File.Exists(FilePath))
-            {
-                MessageBox.Show(@"Config.ini: " + FilePath + @" is missing. Please replace the settings file. Circle Dock will now exit.", "Circle Dock");
-                Application.Exit();
-            }
-
             SettingsINI = new Ini(FilePath);
 
             //string[] sectionNames = SettingsINI.GetSectionNames();

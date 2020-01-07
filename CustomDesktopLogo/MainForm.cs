@@ -1,4 +1,4 @@
-﻿// Custom Desktop Logo 2.2 - By: 2008 Eric Wong
+// Custom Desktop Logo 2.2 - By: 2008 Eric Wong
 // October 18th, 2008
 // Custom Desktop Logo is open source software licensed under GNU GENERAL PUBLIC LICENSE V3. 
 // Use it as you wish, but you must share your source code under the terms of use of the license.
@@ -1117,13 +1117,10 @@ namespace CustomDesktopLogo
                     { }
                 }
 
-                settingsINI.SetEntry("Language", "path", @"." + Path.DirectorySeparatorChar + systemFilesDirectoryName +
-                    Path.DirectorySeparatorChar + languagesDirectoryName + Path.DirectorySeparatorChar + @"ExampleLanguageFile.ini");
-                language = new LanguageLoader.LanguageLoader(Application.StartupPath + Path.DirectorySeparatorChar + systemFilesDirectoryName +
-                    Path.DirectorySeparatorChar + languagesDirectoryName + Path.DirectorySeparatorChar + @"ExampleLanguageFile.ini");
+                settingsINI.SetEntry("Language", "path", $@".{Path.DirectorySeparatorChar}{systemFilesDirectoryName}{Path.DirectorySeparatorChar}{languagesDirectoryName}{Path.DirectorySeparatorChar}English.ini");
+                language = new LanguageLoader.LanguageLoader($@"{Application.StartupPath}{Path.DirectorySeparatorChar}{systemFilesDirectoryName}{Path.DirectorySeparatorChar}{languagesDirectoryName}{Path.DirectorySeparatorChar}English.ini");
 
-                languageFilePathTextBox.Text = @"." + Path.DirectorySeparatorChar + systemFilesDirectoryName +
-                    Path.DirectorySeparatorChar + languagesDirectoryName + Path.DirectorySeparatorChar + @"ExampleLanguageFile.ini";
+                languageFilePathTextBox.Text = $@".{Path.DirectorySeparatorChar}{systemFilesDirectoryName}{Path.DirectorySeparatorChar}{languagesDirectoryName}{Path.DirectorySeparatorChar}English.ini";
             }
             else
             {
