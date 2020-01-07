@@ -129,22 +129,22 @@ namespace CustomDesktopLogo
 
         private void linkLabelSupportForum_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("http://www.donationcoder.com/Forums/bb/index.php?board=240.0");
+            Utils.Utils.OpenUrl("http://www.donationcoder.com/Forums/bb/index.php?board=240.0");
         }
 
         private void linkLabelOfficialWebsite_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("http://customdesktoplogo.wikidot.com/");
+	        Utils.Utils.OpenUrl("http://customdesktoplogo.wikidot.com/");
         }
 
         private void linkLabelEmailAuthor_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("mailto:VideoInPicture@gmail.com");
+	        Utils.Utils.OpenUrl("mailto:VideoInPicture@gmail.com");
         }
 
         private void donateLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VideoInPicture%40gmail%2ecom&lc=CA&item_name=Window%20Custom%20Desktop%20Logo%20Development&currency_code=CAD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted");
+	        Utils.Utils.OpenUrl("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=VideoInPicture%40gmail%2ecom&lc=CA&item_name=Window%20Custom%20Desktop%20Logo%20Development&currency_code=CAD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted");
         }
 
         private void AboutBox_Activated(object sender, EventArgs e)

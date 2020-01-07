@@ -43,5 +43,16 @@ namespace CustomDesktopLogo.Utils
 			var dllPath = GetDllPath();
 			return Path.Combine(Path.GetDirectoryName(dllPath) ?? throw new InvalidOperationException(), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
 		}
+
+		public static void OpenUrl(string path)
+		{
+			new Process
+			{
+				StartInfo = new ProcessStartInfo(path)
+				{
+					UseShellExecute = true
+				}
+			}.Start();
+		}
 	}
 }
