@@ -1056,7 +1056,7 @@ namespace CustomDesktopLogo
         {
             AnimationTimer.Stop();
             MainFormTrayIcon.Dispose();
-            Environment.Exit(0);
+            //Environment.Exit(0);
             //closeAllLogos();
         }
 

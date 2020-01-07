@@ -21,42 +21,43 @@
 // Only one instance of the program is allowed to run from one folder to prevent two programs from writing into the same settings files at the same time.
 
 
+using CustomDesktopLogo.Utils;
 using System;
-using System.Diagnostics;		
-using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace CustomDesktopLogo
 {
-    static class Program
+    internal static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
-            Application.EnableVisualStyles();
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
+            var identifier = $@"Global\CustomDesktopLogo_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+            using var singleInstance = new SingleInstance.SingleInstance(identifier);
+            if (!singleInstance.IsFirstInstance)
+            {
+	            Application.Exit();
+                return;
+            }
 
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             // Add the event handler for handling UI thread exceptions to the event.
-            Application.ThreadException += new ThreadExceptionEventHandler(Program_UIThreadException);
+            Application.ThreadException += Program_UIThreadException;
 
             // Set the unhandled exception mode to force all Windows Forms errors to go through
             // our handler.
             Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
 
             // Add the event handler for handling non-UI thread exceptions to the event. 
-            AppDomain.CurrentDomain.UnhandledException +=
-                new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            //Application.Run(new MainForm());
-            if (SingleInstance.SingleApplication.Run(MainForm.Instance))
-            {
-                return;
-            }
+            Application.Run(MainForm.Instance);
         }
 
         // Handle the UI exceptions by showing a dialog box, and asking the user whether
