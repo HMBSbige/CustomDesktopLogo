@@ -31,7 +31,6 @@
 
 using System;
 using System.Data;
-using System.Reflection;
 
 namespace AMS.Profile
 {
@@ -234,7 +233,7 @@ namespace AMS.Profile
         /// <seealso cref="HasEntry" />
         public virtual string GetValue(string section, string entry, string defaultValue)
         {
-            object value = GetValue(section, entry);
+            var value = GetValue(section, entry);
             return (value == null ? defaultValue : value.ToString());
         }
 
@@ -261,7 +260,7 @@ namespace AMS.Profile
         /// <seealso cref="HasEntry" />
         public virtual int GetValue(string section, string entry, int defaultValue)
         {
-            object value = GetValue(section, entry);
+            var value = GetValue(section, entry);
             if (value == null)
                 return defaultValue;
 
@@ -298,7 +297,7 @@ namespace AMS.Profile
         /// <seealso cref="HasEntry" />
         public virtual double GetValue(string section, string entry, double defaultValue)
         {
-            object value = GetValue(section, entry);
+            var value = GetValue(section, entry);
             if (value == null)
                 return defaultValue;
 
@@ -337,7 +336,7 @@ namespace AMS.Profile
         /// <seealso cref="HasEntry" />
         public virtual bool GetValue(string section, string entry, bool defaultValue)
         {
-            object value = GetValue(section, entry);
+            var value = GetValue(section, entry);
             if (value == null)
                 return defaultValue;
 
@@ -368,7 +367,7 @@ namespace AMS.Profile
         /// <seealso cref="GetEntryNames" />
         public virtual bool HasEntry(string section, string entry)
         {
-            string[] entries = GetEntryNames(section);
+            var entries = GetEntryNames(section);
 
             if (entries == null)
                 return false;
@@ -387,7 +386,7 @@ namespace AMS.Profile
         /// <seealso cref="GetSectionNames" />
         public virtual bool HasSection(string section)
         {
-            string[] sections = GetSectionNames();
+            var sections = GetSectionNames();
 
             if (sections == null)
                 return false;
@@ -466,7 +465,7 @@ namespace AMS.Profile
         /// <seealso cref="ReadOnly" />
         public virtual IReadOnlyProfile CloneReadOnly()
         {
-            Profile profile = (Profile)Clone();
+            var profile = (Profile)Clone();
             profile.m_readOnly = true;
 
             return profile;
@@ -494,26 +493,26 @@ namespace AMS.Profile
         {
             VerifyName();
 
-            string[] sections = GetSectionNames();
+            var sections = GetSectionNames();
             if (sections == null)
                 return null;
 
-            DataSet ds = new DataSet(Name);
+            var ds = new DataSet(Name);
 
             // Add a table for each section
-            foreach (string section in sections)
+            foreach (var section in sections)
             {
-                DataTable table = ds.Tables.Add(section);
+                var table = ds.Tables.Add(section);
 
                 // Retrieve the column names and values
-                string[] entries = GetEntryNames(section);
-                DataColumn[] columns = new DataColumn[entries.Length];
-                object[] values = new object[entries.Length];
+                var entries = GetEntryNames(section);
+                var columns = new DataColumn[entries.Length];
+                var values = new object[entries.Length];
 
-                int i = 0;
-                foreach (string entry in entries)
+                var i = 0;
+                foreach (var entry in entries)
                 {
-                    object value = GetValue(section, entry);
+                    var value = GetValue(section, entry);
 
                     columns[i] = new DataColumn(entry, value.GetType());
                     values[i++] = value;
@@ -556,16 +555,16 @@ namespace AMS.Profile
             // Create a section for each table
             foreach (DataTable table in ds.Tables)
             {
-                string section = table.TableName;
-                DataRowCollection rows = table.Rows;
+                var section = table.TableName;
+                var rows = table.Rows;
                 if (rows.Count == 0)
                     continue;
 
                 // Loop through each column and add it as entry with value of the first row				
                 foreach (DataColumn column in table.Columns)
                 {
-                    string entry = column.ColumnName;
-                    object value = rows[0][column];
+                    var entry = column.ColumnName;
+                    var value = rows[0][column];
 
                     SetValue(section, entry, value);
                 }
@@ -589,7 +588,7 @@ namespace AMS.Profile
             {
                 try
                 {
-                    string file = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+                    var file = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
                     return file.Substring(0, file.LastIndexOf('.'));
                 }
                 catch
@@ -697,7 +696,7 @@ namespace AMS.Profile
                 if (Changing == null)
                     return true;
 
-                ProfileChangingArgs e = new ProfileChangingArgs(changeType, section, entry, value);
+                var e = new ProfileChangingArgs(changeType, section, entry, value);
                 OnChanging(e);
                 return !e.Cancel;
             }
@@ -764,10 +763,10 @@ namespace AMS.Profile
         ///   The test failed. </exception>
         public virtual void Test(bool cleanup)
         {
-            string task = "";
+            var task = "";
             try
             {
-                string section = "Profile Test";
+                var section = "Profile Test";
 
                 task = "initializing the profile -- cleaning up the '" + section + "' section";
 
@@ -775,9 +774,9 @@ namespace AMS.Profile
 
                 task = "getting the sections and their count";
 
-                string[] sections = GetSectionNames();
-                int sectionCount = (sections == null ? 0 : sections.Length);
-                bool haveSections = sectionCount > 1;
+                var sections = GetSectionNames();
+                var sectionCount = (sections == null ? 0 : sections.Length);
+                var haveSections = sectionCount > 1;
 
                 task = "adding some valid entries to the '" + section + "' section";
 
@@ -815,8 +814,8 @@ namespace AMS.Profile
 
                 task = "getting the number of entries and their count";
 
-                int expectedEntries = 8;
-                string[] entries = GetEntryNames(section);
+                var expectedEntries = 8;
+                var entries = GetEntryNames(section);
 
                 task = "verifying the number of entries is " + expectedEntries;
 
@@ -825,11 +824,11 @@ namespace AMS.Profile
 
                 task = "checking the values for the entries added";
 
-                string strValue = GetValue(section, "Text entry", "");
+                var strValue = GetValue(section, "Text entry", "");
                 if (strValue != "123 abc")
                     throw new Exception("Incorrect string value found for the Text entry: '" + strValue + "'");
 
-                int nValue = GetValue(section, "Text entry", 321);
+                var nValue = GetValue(section, "Text entry", 321);
                 if (nValue != 0)
                     throw new Exception("Incorrect integer value found for the Text entry: " + nValue);
 
@@ -837,7 +836,7 @@ namespace AMS.Profile
                 if (strValue != "")
                     throw new Exception("Incorrect string value found for the Blank entry: '" + strValue + "'");
 
-                object value = GetValue(section, "Blank entry");
+                var value = GetValue(section, "Blank entry");
                 if (value == null)
                     throw new Exception("Incorrect null value found for the Blank entry");
 
@@ -845,7 +844,7 @@ namespace AMS.Profile
                 if (nValue != 0)
                     throw new Exception("Incorrect integer value found for the Blank entry: " + nValue);
 
-                bool bValue = GetValue(section, "Blank entry", true);
+                var bValue = GetValue(section, "Blank entry", true);
                 if (bValue != false)
                     throw new Exception("Incorrect bool value found for the Blank entry: " + bValue);
 
@@ -868,11 +867,11 @@ namespace AMS.Profile
                 if (nValue != 17)
                     throw new Exception("Incorrect integer value found for the Integer entry: " + nValue);
 
-                double dValue = GetValue(section, "Integer entry", 0.0);
+                var dValue = GetValue(section, "Integer entry", 0.0);
                 if (dValue != 17)
                     throw new Exception("Incorrect double value found for the Integer entry: " + dValue);
 
-                long lValue = Convert.ToInt64(GetValue(section, "Long entry"));
+                var lValue = Convert.ToInt64(GetValue(section, "Long entry"));
                 if (lValue != 1234567890123456789)
                     throw new Exception("Incorrect long value found for the Long entry: " + lValue);
 
@@ -892,7 +891,7 @@ namespace AMS.Profile
                 if (strValue != DateTime.Today.ToString())
                     throw new Exception("Incorrect string value found for the DateTime entry: '" + strValue + "'");
 
-                DateTime today = DateTime.Parse(strValue);
+                var today = DateTime.Parse(strValue);
                 if (today != DateTime.Today)
                     throw new Exception("The DateTime value is not today's date: '" + strValue + "'");
 
@@ -914,7 +913,7 @@ namespace AMS.Profile
 
                 task = "creating a ReadOnly clone of the object";
 
-                IReadOnlyProfile roProfile = CloneReadOnly();
+                var roProfile = CloneReadOnly();
 
                 if (!roProfile.HasSection(section))
                     throw new Exception("The section is missing from the cloned read-only profile");
@@ -982,7 +981,7 @@ namespace AMS.Profile
 
                 task = "verifying the section was deleted";
 
-                int sectionCount2 = GetSectionNames().Length;
+                var sectionCount2 = GetSectionNames().Length;
 
                 if (sectionCount != sectionCount2)
                     throw new Exception("Incorrect number of sections found after deleting: " + sectionCount2);

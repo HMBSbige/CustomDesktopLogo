@@ -20,30 +20,22 @@
 // This file contains the logo object class that we use to create logo objects with in the main form of this program.
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Drawing;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Threading;
-
+using System.Windows.Forms;
 using Constants;
 using PerPixelAlphaForms;
-using LanguageLoader;
-using SettingsLoader;
 
 namespace CustomDesktopLogo
 {
-    public partial class LogoObject : LogoPerPixelAlphaForm
+    public class LogoObject : LogoPerPixelAlphaForm
     {
         #region Windows Form Designer
 
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -51,7 +43,7 @@ namespace CustomDesktopLogo
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
-            if (disposing && (components != null))
+            if (disposing && components != null)
             {
                 components.Dispose();
             }
@@ -60,31 +52,31 @@ namespace CustomDesktopLogo
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LogoObject));
-            this.filePathsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.filePathsContextMenuStrip.SuspendLayout();
-            this.SuspendLayout();
+            components = new Container();
+            var resources = new ComponentResourceManager(typeof(LogoObject));
+            filePathsContextMenuStrip = new ContextMenuStrip(components);
+            filePathsContextMenuStrip.SuspendLayout();
+            SuspendLayout();
             // 
             // filePathsContextMenuStrip
             // 
-            this.filePathsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {});
-            this.filePathsContextMenuStrip.Opening += new CancelEventHandler(filePathsContextMenuStrip_Opening);
-            this.filePathsContextMenuStrip.Name = "filePathsContextMenuStrip";
-            this.filePathsContextMenuStrip.Size = new System.Drawing.Size(153, 70);
+            filePathsContextMenuStrip.Items.AddRange(new ToolStripItem[] {});
+            filePathsContextMenuStrip.Opening += filePathsContextMenuStrip_Opening;
+            filePathsContextMenuStrip.Name = "filePathsContextMenuStrip";
+            filePathsContextMenuStrip.Size = new Size(153, 70);
             // 
             // TransparentObject
             // 
             
-            this.ClientSize = new System.Drawing.Size(1, 1);
-            this.Name = "TransparentObject";
-            this.Activated += new EventHandler(LogoObject_Activated);
-            this.MouseMove += new MouseEventHandler(LogoObject_MouseMove);
-            this.ContextMenuStrip = filePathsContextMenuStrip;
-            this.MouseUp += new MouseEventHandler(LogoObject_MouseUp);
-            this.MouseDown += new MouseEventHandler(LogoObject_MouseDown);
-            this.filePathsContextMenuStrip.ResumeLayout(false);
-            this.ResumeLayout(false);
+            ClientSize = new Size(1, 1);
+            Name = "TransparentObject";
+            Activated += LogoObject_Activated;
+            MouseMove += LogoObject_MouseMove;
+            ContextMenuStrip = filePathsContextMenuStrip;
+            MouseUp += LogoObject_MouseUp;
+            MouseDown += LogoObject_MouseDown;
+            filePathsContextMenuStrip.ResumeLayout(false);
+            ResumeLayout(false);
         }
   
         void filePathsContextMenuStrip_Opening(object sender, CancelEventArgs e)
@@ -93,7 +85,7 @@ namespace CustomDesktopLogo
 
         #endregion
 
-        public System.Windows.Forms.ContextMenuStrip filePathsContextMenuStrip;
+        public ContextMenuStrip filePathsContextMenuStrip;
 
         #region Constructor
 
@@ -105,7 +97,7 @@ namespace CustomDesktopLogo
             currWindowLevel = initialLevel;
             InitializeComponent();
             AllowDrop = true;
-            this.Show();
+            Show();
             SetBitmap(true, images, true, (byte)initialOpacity, true, initialLocation.X, initialLocation.Y);
             SetZLevel(initialLevel);
             SetTransparencyToInput(MainForm.settingsINI.FolderPaths.useAsDropFolder);
@@ -116,13 +108,13 @@ namespace CustomDesktopLogo
             if (filePathsContextMenuStrip.Visible)
                 return;
             if (level == WindowLevelTypes.AlwaysOnBottom)
-                Pinvoke.Win32.SetWindowPos(this.Handle, (IntPtr)Pinvoke.Win32.HWND_BOTTOM, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
+                Pinvoke.Win32.SetWindowPos(Handle, (IntPtr)Pinvoke.Win32.HWND_BOTTOM, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
                     | Pinvoke.Win32.SWP_NOACTIVATE | Pinvoke.Win32.SWP_NOOWNERZORDER | Pinvoke.Win32.SWP_NOREDRAW | Pinvoke.Win32.SWP_NOSENDCHANGING);
             else if (level == WindowLevelTypes.Normal)
-                Pinvoke.Win32.SetWindowPos(this.Handle, (IntPtr)Pinvoke.Win32.HWND_NOTOPMOST, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
+                Pinvoke.Win32.SetWindowPos(Handle, (IntPtr)Pinvoke.Win32.HWND_NOTOPMOST, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
                     | Pinvoke.Win32.SWP_NOACTIVATE | Pinvoke.Win32.SWP_NOOWNERZORDER | Pinvoke.Win32.SWP_NOREDRAW | Pinvoke.Win32.SWP_NOSENDCHANGING);
             else  // Topmost
-                Pinvoke.Win32.SetWindowPos(this.Handle, (IntPtr)Pinvoke.Win32.HWND_TOPMOST, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
+                Pinvoke.Win32.SetWindowPos(Handle, (IntPtr)Pinvoke.Win32.HWND_TOPMOST, 0, 0, 0, 0, Pinvoke.Win32.SWP_NOMOVE | Pinvoke.Win32.SWP_NOSIZE
                     | Pinvoke.Win32.SWP_NOACTIVATE | Pinvoke.Win32.SWP_NOOWNERZORDER | Pinvoke.Win32.SWP_NOREDRAW | Pinvoke.Win32.SWP_NOSENDCHANGING);
         }
 
@@ -132,11 +124,11 @@ namespace CustomDesktopLogo
 
             if (respond)
             {
-                Pinvoke.Win32.SetWindowLong(this.Handle, Constants.GWLConstants.GWL_EXSTYLE, Constants.WindowExStyles.WS_EX_LAYERED | Constants.WindowExStyles.WS_EX_TOOLWINDOW);
+                Pinvoke.Win32.SetWindowLong(Handle, GWLConstants.GWL_EXSTYLE, WindowExStyles.WS_EX_LAYERED | WindowExStyles.WS_EX_TOOLWINDOW);
             }
             else
             {
-                Pinvoke.Win32.SetWindowLong(this.Handle, Constants.GWLConstants.GWL_EXSTYLE, Constants.WindowExStyles.WS_EX_LAYERED | Constants.WindowExStyles.WS_EX_TOOLWINDOW | Constants.WindowExStyles.WS_EX_TRANSPARENT);
+                Pinvoke.Win32.SetWindowLong(Handle, GWLConstants.GWL_EXSTYLE, WindowExStyles.WS_EX_LAYERED | WindowExStyles.WS_EX_TOOLWINDOW | WindowExStyles.WS_EX_TRANSPARENT);
             }
         }
 
@@ -175,7 +167,7 @@ namespace CustomDesktopLogo
         /// </summary>
         protected override void OnDragDrop(DragEventArgs e)
         {
-            string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
+            var files = e.Data.GetData(DataFormats.FileDrop) as string[];
             if (files != null)
             {
                 //Console.WriteLine(e.KeyState);
@@ -200,9 +192,9 @@ namespace CustomDesktopLogo
 
         private void filePathToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ToolStripMenuItem aToolStripMenuItem = (ToolStripMenuItem)sender;
+            var aToolStripMenuItem = (ToolStripMenuItem)sender;
 
-            switch ((String)aToolStripMenuItem.Tag)
+            switch ((string)aToolStripMenuItem.Tag)
             {
                 case "DropFolderMode":
                     MainForm.Instance.useAsDropFolderCheckBoxChecked = aToolStripMenuItem.Checked;
@@ -224,14 +216,11 @@ namespace CustomDesktopLogo
                 case "Quit":
                     MainForm.Instance.Close();
                     break;
-                default:
-                    //do nothing
-                    break;
             }
         }
 
-        bool LeftMouseButtonDown = false;
-        Boolean ThisObjectMovedWithLeftMouse = false;
+        bool LeftMouseButtonDown;
+        bool ThisObjectMovedWithLeftMouse;
         Point StoredMouseOffset = new Point(0, 0);
         Point previousMousePosition = new Point(0, 0);
 
@@ -240,19 +229,19 @@ namespace CustomDesktopLogo
             //Console.WriteLine(MainForm.settingsINI.LogoProperties.disableMovement);
             if (LeftMouseButtonDown)
             {
-                if (!MainForm.settingsINI.LogoProperties.disableMovement && (ThisObjectMovedWithLeftMouse == true || Math.Abs(Cursor.Position.X - previousMousePosition.X) > 5
-                    || Math.Abs(Cursor.Position.Y - previousMousePosition.Y) > 5))
+                if (!MainForm.settingsINI.LogoProperties.disableMovement && (ThisObjectMovedWithLeftMouse || Math.Abs(Cursor.Position.X - previousMousePosition.X) > 5
+                                                                                                          || Math.Abs(Cursor.Position.Y - previousMousePosition.Y) > 5))
                 {
                     ThisObjectMovedWithLeftMouse = true;
-                    SetBitmap(false, null, false, (byte)255, true, Cursor.Position.X - StoredMouseOffset.X, Cursor.Position.Y - StoredMouseOffset.Y);
+                    SetBitmap(false, null, false, 255, true, Cursor.Position.X - StoredMouseOffset.X, Cursor.Position.Y - StoredMouseOffset.Y);
                 }
             }
         }
 
         public void showContextMenu()
         {
-            this.filePathsContextMenuStrip.Show(MousePosition.X, MousePosition.Y);
-            this.filePathsContextMenuStrip.BringToFront();
+            filePathsContextMenuStrip.Show(MousePosition.X, MousePosition.Y);
+            filePathsContextMenuStrip.BringToFront();
         }
 
         void LogoObject_MouseUp(object sender, MouseEventArgs e)
@@ -270,19 +259,19 @@ namespace CustomDesktopLogo
             {
                 filePathsContextMenuStrip.Items.Clear();
 
-                ToolStripMenuItem dropFolderModeToolStripMenuItem = new ToolStripMenuItem();
+                var dropFolderModeToolStripMenuItem = new ToolStripMenuItem();
                 dropFolderModeToolStripMenuItem.Name = "dropFolderModeToolStripMenuItem";
-                dropFolderModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                dropFolderModeToolStripMenuItem.Size = new Size(152, 22);
                 dropFolderModeToolStripMenuItem.Text = MainForm.language.mainContextMenu.dropFolderMode;
                 dropFolderModeToolStripMenuItem.Tag = "DropFolderMode";
                 dropFolderModeToolStripMenuItem.CheckOnClick = true;
                 dropFolderModeToolStripMenuItem.Checked = MainForm.Instance.useAsDropFolderCheckBoxChecked;
-                dropFolderModeToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                dropFolderModeToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(dropFolderModeToolStripMenuItem);
 
-                ToolStripMenuItem disableMovementModeToolStripMenuItem = new ToolStripMenuItem();
+                var disableMovementModeToolStripMenuItem = new ToolStripMenuItem();
                 disableMovementModeToolStripMenuItem.Name = "disableMovementModeToolStripMenuItem";
-                disableMovementModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                disableMovementModeToolStripMenuItem.Size = new Size(152, 22);
                 disableMovementModeToolStripMenuItem.Text = MainForm.language.mainContextMenu.disableMovement;
                 disableMovementModeToolStripMenuItem.Tag = "DisableMovement";
                 if (MainForm.Instance.useAsDropFolderCheckBoxChecked)
@@ -291,41 +280,41 @@ namespace CustomDesktopLogo
                     disableMovementModeToolStripMenuItem.Enabled = false;
                 disableMovementModeToolStripMenuItem.CheckOnClick = true;
                 disableMovementModeToolStripMenuItem.Checked = MainForm.Instance.disableMovementCheckBoxChecked;
-                disableMovementModeToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                disableMovementModeToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(disableMovementModeToolStripMenuItem);
 
-                ToolStripMenuItem hideLogosToolStripMenuItem = new ToolStripMenuItem();
+                var hideLogosToolStripMenuItem = new ToolStripMenuItem();
                 hideLogosToolStripMenuItem.Name = "hideLogosToolStripMenuItem";
-                hideLogosToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                hideLogosToolStripMenuItem.Size = new Size(152, 22);
                 hideLogosToolStripMenuItem.Text = MainForm.language.mainContextMenu.hideLogo;
                 hideLogosToolStripMenuItem.Tag = "HideLogos";
                 hideLogosToolStripMenuItem.CheckOnClick = true;
                 hideLogosToolStripMenuItem.Checked = MainForm.Instance.hideLogosToolStripMenuItemChecked;
-                hideLogosToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                hideLogosToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(hideLogosToolStripMenuItem);
 
-                ToolStripMenuItem settingsToolStripMenuItem = new ToolStripMenuItem();
+                var settingsToolStripMenuItem = new ToolStripMenuItem();
                 settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-                settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                settingsToolStripMenuItem.Size = new Size(152, 22);
                 settingsToolStripMenuItem.Text = MainForm.language.mainContextMenu.settings;
                 settingsToolStripMenuItem.Tag = "Settings";
-                settingsToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                settingsToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(settingsToolStripMenuItem);
 
-                ToolStripMenuItem helpAboutToolStripMenuItem = new ToolStripMenuItem();
+                var helpAboutToolStripMenuItem = new ToolStripMenuItem();
                 helpAboutToolStripMenuItem.Name = "helpAboutToolStripMenuItem";
-                helpAboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                helpAboutToolStripMenuItem.Size = new Size(152, 22);
                 helpAboutToolStripMenuItem.Text = MainForm.language.mainContextMenu.helpabout;
                 helpAboutToolStripMenuItem.Tag = "HelpAbout";
-                helpAboutToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                helpAboutToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(helpAboutToolStripMenuItem);
 
-                ToolStripMenuItem quitToolStripMenuItem = new ToolStripMenuItem();
+                var quitToolStripMenuItem = new ToolStripMenuItem();
                 quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-                quitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                quitToolStripMenuItem.Size = new Size(152, 22);
                 quitToolStripMenuItem.Text = MainForm.language.mainContextMenu.quit;
                 quitToolStripMenuItem.Tag = "Quit";
-                quitToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                quitToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                 filePathsContextMenuStrip.Items.Add(quitToolStripMenuItem);
 
                 filePathsContextMenuStrip.Show();
@@ -340,7 +329,7 @@ namespace CustomDesktopLogo
             {
                 LeftMouseButtonDown = true;
                 ThisObjectMovedWithLeftMouse = false;
-                StoredMouseOffset = new Point(Cursor.Position.X - this._Location.X, Cursor.Position.Y - this._Location.Y);
+                StoredMouseOffset = new Point(Cursor.Position.X - _Location.X, Cursor.Position.Y - _Location.Y);
                 previousMousePosition = Cursor.Position;
             }
         }

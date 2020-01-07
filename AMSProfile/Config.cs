@@ -1,4 +1,4 @@
-/*
+﻿/*
  * AMS.Profile Class Library
  * 
  * Written by Alvaro Mendez
@@ -31,9 +31,7 @@
 
 using System;
 using System.IO;
-using System.Text;
 using System.Xml;
-using System.Reflection;
 
 namespace AMS.Profile
 {
@@ -292,8 +290,8 @@ namespace AMS.Profile
 			if (!RaiseChangeEvent(true, ProfileChangeType.SetValue, section, entry, value))
 				return;
 			
-			bool hasGroupName = HasGroupName;
-			bool isAppSettings = IsAppSettings(section);
+			var hasGroupName = HasGroupName;
+			var isAppSettings = IsAppSettings(section);
 			
 			// If the file does not exist, use the writer to quickly create it
 			if ((m_buffer == null || m_buffer.IsEmpty) && !File.Exists(Name))
@@ -350,8 +348,8 @@ namespace AMS.Profile
 			
 			// The file exists, edit it
 			
-			XmlDocument doc = GetXmlDocument();
-			XmlElement root = doc.DocumentElement;
+			var doc = GetXmlDocument();
+			var root = doc.DocumentElement;
 			
 			XmlAttribute attribute = null;
 			XmlNode sectionNode = null;
@@ -360,18 +358,18 @@ namespace AMS.Profile
 			if (!isAppSettings)
 			{
 				// Get the configSections element and add it if it's not there
-				XmlNode sectionsNode = root.SelectSingleNode("configSections");
+				var sectionsNode = root.SelectSingleNode("configSections");
 				if (sectionsNode == null)
 					sectionsNode = root.AppendChild(doc.CreateElement("configSections"));			
 	
-				XmlNode sectionGroupNode = sectionsNode;
+				var sectionGroupNode = sectionsNode;
 				if (hasGroupName)
 				{
 					// Get the sectionGroup element and add it if it's not there
 					sectionGroupNode = sectionsNode.SelectSingleNode("sectionGroup[@name=\"" + m_groupName + "\"]");
 					if (sectionGroupNode == null)
 					{
-						XmlElement element = doc.CreateElement("sectionGroup");
+						var element = doc.CreateElement("sectionGroup");
 						attribute = doc.CreateAttribute("name");
 						attribute.Value = m_groupName;
 						element.Attributes.Append(attribute);			
@@ -383,7 +381,7 @@ namespace AMS.Profile
 				sectionNode = sectionGroupNode.SelectSingleNode("section[@name=\"" + section + "\"]");
 				if (sectionNode == null)
 				{
-					XmlElement element = doc.CreateElement("section");
+					var element = doc.CreateElement("section");
 					attribute = doc.CreateAttribute("name");
 					attribute.Value = section;
 					element.Attributes.Append(attribute);			
@@ -412,10 +410,10 @@ namespace AMS.Profile
 				sectionNode = groupNode.AppendChild(doc.CreateElement(section));			
 
 			// Get the 'add' element and add it if it's not there
-			XmlNode entryNode = sectionNode.SelectSingleNode("add[@key=\"" + entry + "\"]");
+			var entryNode = sectionNode.SelectSingleNode("add[@key=\"" + entry + "\"]");
 			if (entryNode == null)
 			{
-				XmlElement element = doc.CreateElement("add");
+				var element = doc.CreateElement("add");
 				attribute = doc.CreateAttribute("key");
 				attribute.Value = entry;
 				element.Attributes.Append(attribute);			
@@ -458,10 +456,10 @@ namespace AMS.Profile
 
 			try
 			{
-				XmlDocument doc = GetXmlDocument();
-				XmlElement root = doc.DocumentElement;				
+				var doc = GetXmlDocument();
+				var root = doc.DocumentElement;				
 				
-				XmlNode entryNode = root.SelectSingleNode(GroupNameSlash + section + "/add[@key=\"" + entry + "\"]");
+				var entryNode = root.SelectSingleNode(GroupNameSlash + section + "/add[@key=\"" + entry + "\"]");
 				return entryNode.Attributes["value"].Value;
 			}
 			catch
@@ -500,13 +498,13 @@ namespace AMS.Profile
 			VerifyAndAdjustEntry(ref entry);
 
 			// Verify the document exists
-			XmlDocument doc = GetXmlDocument();
+			var doc = GetXmlDocument();
 			if (doc == null)
 				return;
 
 			// Get the entry's node, if it exists
-			XmlElement root = doc.DocumentElement;			
-			XmlNode entryNode = root.SelectSingleNode(GroupNameSlash + section + "/add[@key=\"" + entry + "\"]");
+			var root = doc.DocumentElement;			
+			var entryNode = root.SelectSingleNode(GroupNameSlash + section + "/add[@key=\"" + entry + "\"]");
 			if (entryNode == null)
 				return;
 
@@ -545,17 +543,17 @@ namespace AMS.Profile
 			VerifyAndAdjustSection(ref section);
 
 			// Verify the document exists
-			XmlDocument doc = GetXmlDocument();
+			var doc = GetXmlDocument();
 			if (doc == null)
 				return;
 
 			// Get the root node, if it exists
-			XmlElement root = doc.DocumentElement;
+			var root = doc.DocumentElement;
 			if (root == null)
 				return;
 
 			// Get the section's node, if it exists
-			XmlNode sectionNode = root.SelectSingleNode(GroupNameSlash + section);
+			var sectionNode = root.SelectSingleNode(GroupNameSlash + section);
 			if (sectionNode == null)
 				return;
 			
@@ -600,17 +598,17 @@ namespace AMS.Profile
 				return null;
 			    			
 			VerifyAndAdjustSection(ref section);
-			XmlDocument doc = GetXmlDocument();
-			XmlElement root = doc.DocumentElement;
+			var doc = GetXmlDocument();
+			var root = doc.DocumentElement;
 			
 			// Get the entry nodes
-			XmlNodeList entryNodes = root.SelectNodes(GroupNameSlash + section + "/add[@key]");
+			var entryNodes = root.SelectNodes(GroupNameSlash + section + "/add[@key]");
 			if (entryNodes == null)
 				return null;
 
 			// Add all entry names to the string array			
-			string[] entries = new string[entryNodes.Count];
-			int i = 0;
+			var entries = new string[entryNodes.Count];
+			var i = 0;
 			
 			foreach (XmlNode node in entryNodes)
 				entries[i++] = node.Attributes["key"].Value;
@@ -632,28 +630,28 @@ namespace AMS.Profile
 		public override string[] GetSectionNames()
 		{
 			// Verify the document exists
-			XmlDocument doc = GetXmlDocument();
+			var doc = GetXmlDocument();
 			if (doc == null)
 				return null;
 
 			// Get the root node, if it exists
-			XmlElement root = doc.DocumentElement;
+			var root = doc.DocumentElement;
 			if (root == null)
 				return null;
 
 			// Get the group node
-			XmlNode groupNode = (HasGroupName ? root.SelectSingleNode(m_groupName) : root);
+			var groupNode = (HasGroupName ? root.SelectSingleNode(m_groupName) : root);
 			if (groupNode == null)
 				return null;
 
 			// Get the section nodes
-			XmlNodeList sectionNodes = groupNode.ChildNodes;
+			var sectionNodes = groupNode.ChildNodes;
 			if (sectionNodes == null)
 				return null;
 
 			// Add all section names to the string array			
-			string[] sections = new string[sectionNodes.Count];			
-			int i = 0;
+			var sections = new string[sectionNodes.Count];			
+			var i = 0;
 
 			foreach (XmlNode node in sectionNodes)
 				sections[i++] = node.Name;

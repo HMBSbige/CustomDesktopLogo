@@ -21,13 +21,10 @@
 
 
 using System;
-using System.Windows.Forms;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
-
-using AMS.Profile;      // Allows for .ini file manipulation
-using LanguageInformation;  
+using System.Windows.Forms;
+using AMS.Profile;
+using LanguageInformation; // Allows for .ini file manipulation
 
 namespace LanguageLoader
 {
@@ -37,11 +34,11 @@ namespace LanguageLoader
 
         private Profile LanguageINI;
 
-        public LanguageInformation.General general = new LanguageInformation.General();
-        public LanguageInformation.LanguageFile languageFile = new LanguageInformation.LanguageFile();
-        public LanguageInformation.MainContextMenu mainContextMenu = new LanguageInformation.MainContextMenu();
-        public LanguageInformation.HelpAbout helpAbout = new LanguageInformation.HelpAbout();
-        public LanguageInformation.ErrorMessages errorMessages = new LanguageInformation.ErrorMessages();
+        public General general;
+        public LanguageFile languageFile;
+        public MainContextMenu mainContextMenu;
+        public HelpAbout helpAbout;
+        public ErrorMessages errorMessages;
 
         #endregion
 
@@ -52,7 +49,7 @@ namespace LanguageLoader
         /// The language data is accessed by going to the public structs in this class.
         /// The structs will return "?????" if it cannot find valid language data.
         /// </summary>  
-        public LanguageLoader(String FilePath)
+        public LanguageLoader(string FilePath)
         {
             if (!File.Exists(FilePath))
             {
@@ -73,35 +70,32 @@ namespace LanguageLoader
             loadErrorMessages();
         }
 
-        public void LoadLanguageDataFromNewFile(String FilePath)
+        public void LoadLanguageDataFromNewFile(string FilePath)
         {
             LanguageINI = new Ini(FilePath);
             LoadLanguageData();
         }
 
-        private String GetEntry(String Section, String EntryName)
+        private string GetEntry(string Section, string EntryName)
         {
-            String languageEntry = null;
+            string languageEntry = null;
 
             try
             {
-                languageEntry = (String)LanguageINI.GetValue(Section, EntryName);
+                languageEntry = (string)LanguageINI.GetValue(Section, EntryName);
             }
             catch (Exception)
             { }
 
             if (languageEntry != null)
                 return languageEntry;
-            else
+            try
             {
-                try
-                {
-                    LanguageINI.SetValue(Section, EntryName, @"?????");
-                }
-                catch (Exception)
-                { }
-                return @"?????";
+	            LanguageINI.SetValue(Section, EntryName, @"?????");
             }
+            catch (Exception)
+            { }
+            return @"?????";
         }
 
         #endregion

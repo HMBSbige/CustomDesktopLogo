@@ -19,11 +19,8 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
-using System.Runtime.InteropServices;
-using System.Drawing.Text;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 
 namespace ImageOperations
 {
@@ -43,18 +40,18 @@ namespace ImageOperations
         {
             try
             {
-                int scaleWidth = (int)Math.Max(Bitmap.Width * ScaleFactorX, 1.0f);
-                int scaleHeight = (int)Math.Max(Bitmap.Height * ScaleFactorY, 1.0f);
+                var scaleWidth = (int)Math.Max(Bitmap.Width * ScaleFactorX, 1.0f);
+                var scaleHeight = (int)Math.Max(Bitmap.Height * ScaleFactorY, 1.0f);
 
-                Bitmap scaledBitmap = new Bitmap(scaleWidth, scaleHeight);
+                var scaledBitmap = new Bitmap(scaleWidth, scaleHeight);
 
                 // Scale the bitmap in high quality mode.
-                using (Graphics gr = Graphics.FromImage(scaledBitmap))
+                using (var gr = Graphics.FromImage(scaledBitmap))
                 {
-                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
-                    gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                    gr.SmoothingMode = SmoothingMode.HighSpeed;
+                    gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    gr.CompositingQuality = CompositingQuality.HighSpeed;
+                    gr.InterpolationMode = InterpolationMode.High;
 
                     gr.DrawImage(Bitmap, new Rectangle(0, 0, scaleWidth, scaleHeight), new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), GraphicsUnit.Pixel);
                 }
@@ -79,15 +76,15 @@ namespace ImageOperations
         {
             try
             {
-                Bitmap scaledBitmap = new Bitmap(NewWidth, NewHeight);
+                var scaledBitmap = new Bitmap(NewWidth, NewHeight);
 
                 // Scale the bitmap in high quality mode.
-                using (Graphics gr = Graphics.FromImage(scaledBitmap))
+                using (var gr = Graphics.FromImage(scaledBitmap))
                 {
-                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
-                    gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                    gr.SmoothingMode = SmoothingMode.HighSpeed;
+                    gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    gr.CompositingQuality = CompositingQuality.HighSpeed;
+                    gr.InterpolationMode = InterpolationMode.High;
 
                     gr.DrawImage(Bitmap, new Rectangle(0, 0, NewWidth, NewHeight), new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), GraphicsUnit.Pixel);
                 }
@@ -111,15 +108,15 @@ namespace ImageOperations
         {
             try
             {
-                Bitmap scaledBitmap = new Bitmap(NewWidth, NewHeight);
+                var scaledBitmap = new Bitmap(NewWidth, NewHeight);
 
                 // Scale the bitmap in high quality mode.
-                using (Graphics gr = Graphics.FromImage(scaledBitmap))
+                using (var gr = Graphics.FromImage(scaledBitmap))
                 {
-                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
-                    gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                    gr.SmoothingMode = SmoothingMode.HighSpeed;
+                    gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    gr.CompositingQuality = CompositingQuality.HighSpeed;
+                    gr.InterpolationMode = InterpolationMode.High;
 
                     gr.DrawImage(Bitmap, new Rectangle(0, 0, NewWidth, NewHeight), new Rectangle(0, 0, Bitmap.Width, Bitmap.Height), GraphicsUnit.Pixel);
                 }
@@ -143,18 +140,18 @@ namespace ImageOperations
         {
             try
             {
-                Bitmap scaledBitmap = new Bitmap(NewWidth, NewHeight);
+                var scaledBitmap = new Bitmap(NewWidth, NewHeight);
 
                 // Scale the bitmap in high quality mode.
-                using (Graphics gr = Graphics.FromImage(scaledBitmap))
+                using (var gr = Graphics.FromImage(scaledBitmap))
                 {
-                    gr.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighSpeed;
-                    gr.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                    gr.SmoothingMode = SmoothingMode.HighSpeed;
+                    gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                    gr.CompositingQuality = CompositingQuality.HighSpeed;
+                    gr.InterpolationMode = InterpolationMode.High;
 
-                    double scaledBitmapAspectRatio = (double)scaledBitmap.Width / (double)scaledBitmap.Height;
-                    double sourceBitmapAspectRatio = (double)Bitmap.Width / (double)Bitmap.Height;
+                    var scaledBitmapAspectRatio = scaledBitmap.Width / (double)scaledBitmap.Height;
+                    var sourceBitmapAspectRatio = Bitmap.Width / (double)Bitmap.Height;
 
                     int bestLeft, bestRight, bestTop, bestBottom, calcWidth, calcHeight;
 
@@ -163,7 +160,7 @@ namespace ImageOperations
                         bestLeft = 0;
                         bestRight = scaledBitmap.Width;
 
-                        calcHeight = (int)((double)scaledBitmap.Width / sourceBitmapAspectRatio);
+                        calcHeight = (int)(scaledBitmap.Width / sourceBitmapAspectRatio);
                         bestTop = (scaledBitmap.Height - calcHeight) / 2;
                         bestBottom = calcHeight;
                     }
@@ -172,7 +169,7 @@ namespace ImageOperations
                         bestTop = 0;
                         bestBottom = scaledBitmap.Height;
 
-                        calcWidth = (int)((double)scaledBitmap.Height * sourceBitmapAspectRatio);
+                        calcWidth = (int)(scaledBitmap.Height * sourceBitmapAspectRatio);
                         bestLeft = (scaledBitmap.Width - calcWidth) / 2;
                         bestRight = calcWidth;
                     }
@@ -214,13 +211,13 @@ namespace ImageOperations
 
             Bitmap bmpOut = null; // bitmap we are creating and will return from this function.
 
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            using (var g = Graphics.FromHwnd(IntPtr.Zero))
             {
-                SizeF sz = g.MeasureString(strText, fnt);
-                using (Bitmap bmp = new Bitmap((int)sz.Width, (int)sz.Height))
-                using (Graphics gBmp = Graphics.FromImage(bmp))
-                using (SolidBrush brBack = new SolidBrush(Color.FromArgb(blurAlpha, clrBack.R, clrBack.G, clrBack.B)))
-                using (SolidBrush brFore = new SolidBrush(clrFore))
+                var sz = g.MeasureString(strText, fnt);
+                using (var bmp = new Bitmap((int)sz.Width, (int)sz.Height))
+                using (var gBmp = Graphics.FromImage(bmp))
+                using (var brBack = new SolidBrush(Color.FromArgb(blurAlpha, clrBack.R, clrBack.G, clrBack.B)))
+                using (var brFore = new SolidBrush(clrFore))
                 {
                     gBmp.SmoothingMode = SmoothingMode.HighSpeed;
                     gBmp.InterpolationMode = InterpolationMode.HighQualityBilinear;
@@ -230,15 +227,15 @@ namespace ImageOperations
 
                     // make bitmap we will return.
                     bmpOut = new Bitmap(bmp.Width + blurAmount, bmp.Height + blurAmount);
-                    using (Graphics gBmpOut = Graphics.FromImage(bmpOut))
+                    using (var gBmpOut = Graphics.FromImage(bmpOut))
                     {
                         gBmpOut.SmoothingMode = SmoothingMode.HighSpeed;
                         gBmpOut.InterpolationMode = InterpolationMode.HighQualityBilinear;
                         gBmpOut.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
                         // smear image of background of text about to make blurred background "halo"
-                        for (int x = 0; x <= blurAmount; x++)
-                            for (int y = 0; y <= blurAmount; y++)
+                        for (var x = 0; x <= blurAmount; x++)
+                            for (var y = 0; y <= blurAmount; y++)
                                 gBmpOut.DrawImageUnscaled(bmp, x, y);
 
                         // draw actual text

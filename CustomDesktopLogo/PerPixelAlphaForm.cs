@@ -1,4 +1,4 @@
-// Custom Desktop Logo 2.0 - By: 2008 Eric Wong
+﻿// Custom Desktop Logo 2.0 - By: 2008 Eric Wong
 // September 20th, 2008
 // Custom Desktop Logo is open source software licensed under GNU GENERAL PUBLIC LICENSE V3. 
 // Use it as you wish, but you must share your source code under the terms of use of the license.
@@ -21,11 +21,8 @@
 
 using System;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
-using ImageOperations;
+using System.Windows.Forms;
 
 namespace PerPixelAlphaForms
 {
@@ -34,18 +31,14 @@ namespace PerPixelAlphaForms
     /// </summary>
     public class LogoPerPixelAlphaForm : PerPixelAlphaForm
     {
-        public LogoPerPixelAlphaForm()
-        {
-        }
-
-        /// <summary>
+	    /// <summary>
         /// Allows us to set the window styles at creation time to allow for widget type objects.
         /// </summary>
         protected override CreateParams CreateParams
         {
             get
             {
-                CreateParams cp = base.CreateParams;
+                var cp = base.CreateParams;
 
                 //Set the form to be a layered type to allow for alpha blended graphics and makes it a toolwindow type to 
                 //remove it from the taskbar and Alt-Tab list.
@@ -66,33 +59,15 @@ namespace PerPixelAlphaForms
     {
         private Point previousLocation = new Point(0, 0);
 
-        public Point _Location
-        {
-            get
-            {
-                return previousLocation;
-            }
-        }
+        public Point _Location => previousLocation;
 
         private int previousOpacity = 255;
 
-        public int _Opacity
-        {
-            get
-            {
-                return previousOpacity;
-            }
-        }
+        public int _Opacity => previousOpacity;
 
         private Bitmap previousBitmap = new Bitmap(1, 1);
 
-        public Bitmap _Bitmap
-        {
-            get
-            {
-                return previousBitmap;
-            }
-        }
+        public Bitmap _Bitmap => previousBitmap;
 
         #region Constructor
 
@@ -136,9 +111,9 @@ namespace PerPixelAlphaForms
         {
             // Set the value of the double-buffering style bits to true.
             DoubleBuffered = true;
-            this.SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint |
+            SetStyle(ControlStyles.DoubleBuffer | ControlStyles.UserPaint |
                             ControlStyles.AllPaintingInWmPaint, true);
-            this.UpdateStyles();
+            UpdateStyles();
         }
 
         #endregion
@@ -154,10 +129,10 @@ namespace PerPixelAlphaForms
         public void SetBitmap(bool setNewBitmap, Bitmap bitmap, bool setNewOpacity, byte opacity, 
             bool setNewPos, int newLeftPos, int newTopPos)
         {
-            IntPtr hBitmap = IntPtr.Zero;
-            IntPtr oldBitmap = IntPtr.Zero;
-            IntPtr screenDc = Win32.GetDC(IntPtr.Zero);
-            IntPtr memDc = Win32.CreateCompatibleDC(screenDc);
+            var hBitmap = IntPtr.Zero;
+            var oldBitmap = IntPtr.Zero;
+            var screenDc = Win32.GetDC(IntPtr.Zero);
+            var memDc = Win32.CreateCompatibleDC(screenDc);
 
             try
             {
@@ -181,18 +156,18 @@ namespace PerPixelAlphaForms
 
                 oldBitmap = Win32.SelectObject(memDc, hBitmap);
 
-                Size size = new Size(previousBitmap.Width, previousBitmap.Height);
+                var size = new Size(previousBitmap.Width, previousBitmap.Height);
 
-                Point pointSource = new Point(0, 0);
+                var pointSource = new Point(0, 0);
 
-                Win32.BLENDFUNCTION blend = new Win32.BLENDFUNCTION();
+                var blend = new Win32.BLENDFUNCTION();
                 blend.BlendOp = 0;
                 blend.BlendFlags = 0;
 
                 if (setNewOpacity)
                 {
                     blend.SourceConstantAlpha = opacity;
-                    previousOpacity = (int)opacity;
+                    previousOpacity = opacity;
                 }
                 else
                 {
@@ -201,9 +176,9 @@ namespace PerPixelAlphaForms
 
                 blend.AlphaFormat = 1;
 
-                if (setNewPos == true)
+                if (setNewPos)
                 {
-                    Point topPos = new Point(newLeftPos, newTopPos);
+                    var topPos = new Point(newLeftPos, newTopPos);
                     previousLocation = topPos;
                     Win32.UpdateLayeredWindow(Handle, screenDc, ref topPos, ref size, memDc, ref pointSource, 0, ref blend, Win32.ULW_ALPHA);
                 }
@@ -255,25 +230,25 @@ namespace PerPixelAlphaForms
 
 
         [DllImportAttribute("user32.dll")]
-        public extern static bool UpdateLayeredWindow(IntPtr handle, IntPtr hdcDst, ref Point pptDst, ref Size psize, IntPtr hdcSrc, ref Point pprSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
+        public static extern bool UpdateLayeredWindow(IntPtr handle, IntPtr hdcDst, ref Point pptDst, ref Size psize, IntPtr hdcSrc, ref Point pprSrc, int crKey, ref BLENDFUNCTION pblend, int dwFlags);
 
         [DllImportAttribute("user32.dll")]
-        public extern static IntPtr GetDC(IntPtr handle);
+        public static extern IntPtr GetDC(IntPtr handle);
 
         [DllImportAttribute("user32.dll", ExactSpelling = true)]
-        public extern static int ReleaseDC(IntPtr handle, IntPtr hDC);
+        public static extern int ReleaseDC(IntPtr handle, IntPtr hDC);
 
         [DllImportAttribute("gdi32.dll")]
-        public extern static IntPtr CreateCompatibleDC(IntPtr hDC);
+        public static extern IntPtr CreateCompatibleDC(IntPtr hDC);
 
         [DllImportAttribute("gdi32.dll")]
-        public extern static bool DeleteDC(IntPtr hdc);
+        public static extern bool DeleteDC(IntPtr hdc);
 
         [DllImportAttribute("gdi32.dll")]
-        public extern static IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
+        public static extern IntPtr SelectObject(IntPtr hDC, IntPtr hObject);
 
         [DllImportAttribute("gdi32.dll")]
-        public extern static bool DeleteObject(IntPtr hObject);
+        public static extern bool DeleteObject(IntPtr hObject);
     }
 
     #endregion

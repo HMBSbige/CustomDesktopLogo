@@ -40,7 +40,7 @@ namespace CustomDesktopLogo
             using var singleInstance = new SingleInstance.SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
             {
-	            Application.Exit();
+                Application.Exit();
                 return;
             }
 
@@ -64,7 +64,7 @@ namespace CustomDesktopLogo
         // or not they wish to abort execution.
         private static void Program_UIThreadException(object sender, ThreadExceptionEventArgs t)
         {
-            DialogResult result = DialogResult.Cancel;
+            var result = DialogResult.Cancel;
             try
             {
                 result = ShowThreadExceptionDialog("Custom Desktop Logo: Windows Forms Error", t.Exception);
@@ -95,9 +95,9 @@ namespace CustomDesktopLogo
         {
             try
             {
-                Exception ex = (Exception)e.ExceptionObject;
-                string errorMsg = "An application error occurred. Please contact the adminstrator " +
-                    "with the following information:\n\n";
+                var ex = (Exception)e.ExceptionObject;
+                var errorMsg = "An application error occurred. Please contact the adminstrator " +
+                               "with the following information:\n\n";
 
                 // Since we can't prevent the app from terminating, log this to the event log.
                 if (!EventLog.SourceExists("ThreadException"))
@@ -106,7 +106,7 @@ namespace CustomDesktopLogo
                 }
 
                 // Create an EventLog instance and assign its source.
-                EventLog myLog = new EventLog();
+                var myLog = new EventLog();
                 myLog.Source = "ThreadException";
                 myLog.WriteEntry(errorMsg + ex.Message + "\n\nStack Trace:\n" + ex.StackTrace);
 
@@ -130,8 +130,8 @@ namespace CustomDesktopLogo
         // Creates the error message and displays it.
         private static DialogResult ShowThreadExceptionDialog(string title, Exception e)
         {
-            string errorMsg = "An application error occurred. Please contact the adminstrator " +
-                "with the following information:\n\n";
+            var errorMsg = "An application error occurred. Please contact the adminstrator " +
+                           "with the following information:\n\n";
             errorMsg = errorMsg + e.Message + "\n\nStack Trace:\n" + e.StackTrace;
             return MessageBox.Show(errorMsg, title, MessageBoxButtons.AbortRetryIgnore,
                 MessageBoxIcon.Stop);

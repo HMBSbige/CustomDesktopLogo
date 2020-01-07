@@ -1,4 +1,4 @@
-/*
+﻿/*
  * AMS.Profile Class Library
  * 
  * Written by Alvaro Mendez
@@ -91,7 +91,7 @@ namespace AMS.Profile
 			if (!File.Exists(Name))
 				return null;
 
-			XmlDocument doc = new XmlDocument();
+			var doc = new XmlDocument();
 			doc.Load(Name);
 			return doc;
 		}
@@ -342,7 +342,7 @@ namespace AMS.Profile
 		{
 			get
 			{
-				return XmlDocument.InnerXml == String.Empty;
+				return XmlDocument.InnerXml == string.Empty;
 			}
 		}
 

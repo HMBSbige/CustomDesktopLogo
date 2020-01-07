@@ -18,14 +18,7 @@
 // Uses hotkey selector component from http://www.codeproject.com/KB/miscctrl/systemhotkey.aspx (Open source, non-specific license)
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Text;
-
 
 namespace MemoryManagement
 {    
@@ -42,7 +35,7 @@ namespace MemoryManagement
             {
                 if (Environment.OSVersion.Platform >= PlatformID.Win32NT)
                 {
-                    Pinvoke.Win32.SetProcessWorkingSetSize(System.Diagnostics.Process.GetCurrentProcess().Handle, -1, -1);
+                    Pinvoke.Win32.SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle, -1, -1);
                 }
                 else
                 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Constants
+﻿namespace Constants
 {
     class WindowMessageConstants
     {
@@ -353,17 +349,17 @@ namespace Constants
         // Common Window Styles
 
         public const int WS_OVERLAPPEDWINDOW =
-            (WS_OVERLAPPED |
-              WS_CAPTION |
-              WS_SYSMENU |
-              WS_THICKFRAME |
-              WS_MINIMIZEBOX |
-              WS_MAXIMIZEBOX);
+            WS_OVERLAPPED |
+            WS_CAPTION |
+            WS_SYSMENU |
+            WS_THICKFRAME |
+            WS_MINIMIZEBOX |
+            WS_MAXIMIZEBOX;
 
         public const int WS_POPUPWINDOW =
-            (unchecked((int)WS_POPUP) |
-              WS_BORDER |
-              WS_SYSMENU);
+            unchecked((int)WS_POPUP) |
+            WS_BORDER |
+            WS_SYSMENU;
 
         public const int WS_CHILDWINDOW = WS_CHILD;
     }
@@ -484,24 +480,24 @@ namespace Constants
 
     class GWLConstants
     {
-        public static readonly int GWL_WNDPROC = (-4);
+        public static readonly int GWL_WNDPROC = -4;
 
-        public static readonly int GWL_HINSTANCE = (-6);
+        public static readonly int GWL_HINSTANCE = -6;
 
-        public static readonly int GWL_HWNDPARENT = (-8);
+        public static readonly int GWL_HWNDPARENT = -8;
 
-        public static readonly int GWL_STYLE = (-16);
+        public static readonly int GWL_STYLE = -16;
 
-        public static readonly int GWL_EXSTYLE = (-20);
+        public static readonly int GWL_EXSTYLE = -20;
 
-        public static readonly int GWL_USERDATA = (-21);
+        public static readonly int GWL_USERDATA = -21;
 
-        public static readonly int GWL_ID = (-12);
+        public static readonly int GWL_ID = -12;
     }
 
     class GCLConstants
     {
-        public static readonly int GCL_STYLE = (-26);
+        public static readonly int GCL_STYLE = -26;
     }
 
     class ClassStyles
@@ -1769,7 +1765,7 @@ namespace Constants
         /// <summary>
         /// Not implemented.
         /// </summary>
-        SPI_SETFONTSMOOTHINGORIENTATION = 0x2013,
+        SPI_SETFONTSMOOTHINGORIENTATION = 0x2013
     }
     #endregion // SPI
 

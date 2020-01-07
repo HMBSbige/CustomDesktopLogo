@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
 
 namespace Hook
 {
@@ -89,7 +87,7 @@ namespace Hook
 
         public Hooks()
         {
-            dEvent = this.WinEvent;
+            dEvent = WinEvent;
             pHook = SetWinEventHook(
                 (uint)SystemEvents.EVENT_SYSTEM_DESTROY,
                 (uint)SystemEvents.EVENT_SYSTEM_DESTROY,

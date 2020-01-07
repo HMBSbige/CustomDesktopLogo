@@ -1,4 +1,4 @@
-/*
+﻿/*
  * AMS.Profile Class Library
  * 
  * Written by Alvaro Mendez
@@ -38,10 +38,8 @@
 
 using System;
 using System.Text;
-using System.Collections;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using System.Reflection;
 using System.IO;
 
 namespace AMS.Profile
@@ -227,10 +225,10 @@ namespace AMS.Profile
             VerifyAndAdjustEntry(ref entry);
 
             // Loop until the buffer has grown enough to fit the value
-            for (int maxSize = 250; true; maxSize *= 2)
+            for (var maxSize = 250; true; maxSize *= 2)
             {
-                StringBuilder result = new StringBuilder(maxSize);
-                int size = 2 * GetPrivateProfileString(section, entry, "", result, maxSize / 2, Name);
+                var result = new StringBuilder(maxSize);
+                var size = 2 * GetPrivateProfileString(section, entry, "", result, maxSize / 2, Name);
 
                 if (size < maxSize - 2)
                 {
@@ -336,15 +334,15 @@ namespace AMS.Profile
             VerifyAndAdjustSection(ref section);
 
             // Loop until the buffer has grown enough to fit the value
-            for (int maxSize = 500; true; maxSize *= 2)
+            for (var maxSize = 500; true; maxSize *= 2)
             {
-                byte[] bytes = new byte[maxSize];
-                int size = 2 * GetPrivateProfileString(section, null, "", bytes, maxSize / 2, Name);
+                var bytes = new byte[maxSize];
+                var size = 2 * GetPrivateProfileString(section, null, "", bytes, maxSize / 2, Name);
 
                 if (size < maxSize - 4)
                 {
                     // Convert the buffer to a string and split it
-                    string entries = Encoding.Unicode.GetString(bytes, 0, (size - (size > 1 ? 2 : 0)));
+                    var entries = Encoding.Unicode.GetString(bytes, 0, (size - (size > 1 ? 2 : 0)));
 
                     if (entries == "")
                         return new string[0];
@@ -367,15 +365,15 @@ namespace AMS.Profile
                 return null;
 
             // Loop until the buffer has grown enough to fit the value
-            for (int maxSize = 500; true; maxSize *= 2)
+            for (var maxSize = 500; true; maxSize *= 2)
             {
-                byte[] bytes = new byte[maxSize];
-                int size = 2 * GetPrivateProfileString(null, null, "", bytes, maxSize / 2, Name);
+                var bytes = new byte[maxSize];
+                var size = 2 * GetPrivateProfileString(null, null, "", bytes, maxSize / 2, Name);
 
                 if (size < maxSize - 4)
                 {
                     // Convert the buffer to a string and split it
-                    string sections = Encoding.Unicode.GetString(bytes, 0, (size - (size > 1 ? 2 : 0)));
+                    var sections = Encoding.Unicode.GetString(bytes, 0, (size - (size > 1 ? 2 : 0)));
 
                     if (sections == "")
                         return new string[0];

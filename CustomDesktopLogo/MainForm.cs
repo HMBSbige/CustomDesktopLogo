@@ -1,4 +1,4 @@
-// Custom Desktop Logo 2.2 - By: 2008 Eric Wong
+﻿// Custom Desktop Logo 2.2 - By: 2008 Eric Wong
 // October 18th, 2008
 // Custom Desktop Logo is open source software licensed under GNU GENERAL PUBLIC LICENSE V3. 
 // Use it as you wish, but you must share your source code under the terms of use of the license.
@@ -20,26 +20,18 @@
 // Uses hotkey selector component from http://www.codeproject.com/KB/miscctrl/systemhotkey.aspx (Open source, non-specific license)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using System.Threading;
-using System.Runtime.InteropServices;
-using System.IO;
 using System.Diagnostics;
-
-using AMS.Profile;
-using PerPixelAlphaForms;
-using LanguageLoader;
-using SettingsLoader;
+using System.Drawing;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using Hook;
 using ImageOperations;
 using MemoryManagement;
-using Hook;
-
 
 namespace CustomDesktopLogo
 {
@@ -112,17 +104,17 @@ namespace CustomDesktopLogo
         /// </summary>
         static List<Bitmap> imageBitmaps = new List<Bitmap>();
 
-        static int imageBitmapsIndex = 0;
+        static int imageBitmapsIndex;
 
-        static int elapsedTime = 0;
+        static int elapsedTime;
 
-        static bool loaded = false;
+        static bool loaded;
 
         static Size desiredLogoSize = new Size(1, 1);
 
-        static bool scaleImageFactorChanged = false;
+        static bool scaleImageFactorChanged;
 
-        static bool isUpdatingLogoGraphics = false;
+        static bool isUpdatingLogoGraphics;
 
         static Hooks windowsHook = new Hooks();
 
@@ -134,13 +126,7 @@ namespace CustomDesktopLogo
         delegate void UpdateSizeOpacityCallback();
 
         private static MainForm instance;
-        public static MainForm Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public static MainForm Instance => instance;
 
         #endregion
 
@@ -158,7 +144,7 @@ namespace CustomDesktopLogo
         {
             InitializeComponent();
 
-            Control.CheckForIllegalCrossThreadCalls = false;
+            CheckForIllegalCrossThreadCalls = false;
             checkSystemFoldersExist();
 
             // Load settings from files
@@ -170,15 +156,15 @@ namespace CustomDesktopLogo
 
             // We require this hook to correct a Windows bug where a topmost window will become not topmost in some cases
             // when other programs refresh the screen.
-            windowsHook.OnForegroundWindowChanged += new OnForegroundWindowChangedDelegate(window_ForegroundChanged);
+            windowsHook.OnForegroundWindowChanged += window_ForegroundChanged;
             GC.KeepAlive(windowsHook);
         }
 
         private void MainForm_Shown(object sender, EventArgs e)
         {
-            this.Hide();
-            this.ShowInTaskbar = true;
-            this.Opacity = 1.0;
+            Hide();
+            ShowInTaskbar = true;
+            Opacity = 1.0;
             MemoryUtility.ClearUnusedMemory();
         }
 
@@ -333,7 +319,7 @@ namespace CustomDesktopLogo
             {
                 scaleImageFactorTrackBar.Value = 0;
             }
-            scaleImageFactorValueLabel.Text = ((double)(settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0).ToString();
+            scaleImageFactorValueLabel.Text = ((settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0).ToString();
 
             // Animation/Graphics tab
             try
@@ -400,13 +386,13 @@ namespace CustomDesktopLogo
 
             filePathsDataGridView.Rows.Add(numFolderPaths);
 
-            for (int i = 0; i < numFolderPaths; i++)
+            for (var i = 0; i < numFolderPaths; i++)
             {
                 filePathsDataGridView[0, i].Value = settingsINI.FolderPaths.folderPaths[i].displayName;
                 filePathsDataGridView[1, i].Value = settingsINI.FolderPaths.folderPaths[i].path;
             }
 
-            populateFilePathsContextMenuStrip(this.filePathsContextMenuStrip, FileLocationActions.Copy);
+            populateFilePathsContextMenuStrip(filePathsContextMenuStrip, FileLocationActions.Copy);
 
             loaded = true;
         }
@@ -420,12 +406,12 @@ namespace CustomDesktopLogo
             {
                 string[] imageFileDirectory;
                 if (settingsINI.LogoProperties.path.StartsWith(@"." + Path.DirectorySeparatorChar))
-                    imageFileDirectory = System.IO.Directory.GetFiles(Application.StartupPath + settingsINI.LogoProperties.path.Substring(1));
+                    imageFileDirectory = Directory.GetFiles(Application.StartupPath + settingsINI.LogoProperties.path.Substring(1));
                 else
-                    imageFileDirectory = System.IO.Directory.GetFiles(settingsINI.LogoProperties.path);
+                    imageFileDirectory = Directory.GetFiles(settingsINI.LogoProperties.path);
 
-                int counter = 0;
-                foreach (string aFile in imageFileDirectory)
+                var counter = 0;
+                foreach (var aFile in imageFileDirectory)
                 {
                     if (aFile.ToUpper().EndsWith(@"PNG"))
                     {
@@ -434,8 +420,8 @@ namespace CustomDesktopLogo
                         try
                         {
                             anImage = new Bitmap(aFile);
-                            anImage = BitmapOperations.ScaleByFactors(ref anImage, (float)(settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0f,
-                                (float)(settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0f);
+                            anImage = BitmapOperations.ScaleByFactors(ref anImage, (settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0f,
+                                (settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0f);
                             imageBitmaps.Add(anImage);
                             imagesListBox.Items.Add(aFile);
                             counter++;
@@ -449,7 +435,7 @@ namespace CustomDesktopLogo
                     {
                         counter = 0;
                         GC.Collect();
-                        Pinvoke.Win32.PROCESS_MEMORY_COUNTERS memoryCounter = new Pinvoke.Win32.PROCESS_MEMORY_COUNTERS();
+                        var memoryCounter = new Pinvoke.Win32.PROCESS_MEMORY_COUNTERS();
                         Pinvoke.Win32.GetProcessMemoryInfo(Pinvoke.Win32.GetCurrentProcess(), out memoryCounter, Marshal.SizeOf(memoryCounter));
 
                         if (memoryCounter.WorkingSetSize > 100000000)
@@ -473,21 +459,21 @@ namespace CustomDesktopLogo
             }
 
             if (imageBitmaps.Count <= 0)
-                imageBitmaps.Add((Bitmap)FancyText.ImageFromText(@"?????", new Font(System.Drawing.FontFamily.GenericSansSerif, 20, FontStyle.Bold), Color.Black, Color.White, 6, 10));
+                imageBitmaps.Add((Bitmap)FancyText.ImageFromText(@"?????", new Font(FontFamily.GenericSansSerif, 20, FontStyle.Bold), Color.Black, Color.White, 6, 10));
             
             loadLogos();
 
             GC.Collect();
-            MemoryManagement.MemoryUtility.ClearUnusedMemory();
+            MemoryUtility.ClearUnusedMemory();
         }
 
         private void closeAllLogos()
         {
-            for (int i = 0; i < allLogos.Count; i++)
+            for (var i = 0; i < allLogos.Count; i++)
             {
                 if (allLogos[i].InvokeRequired)
                 {
-                    CloseLogoCallback d = new CloseLogoCallback(closeAllLogos);
+                    var d = new CloseLogoCallback(closeAllLogos);
                     allLogos[i].Invoke(d, new object[] { });
                 }
                 else
@@ -517,32 +503,32 @@ namespace CustomDesktopLogo
                     {
                         case LocationTypes.Centre:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomLeftCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
                                 new Point(SystemInformation.VirtualScreen.Left + settingsINI.LogoProperties.xOffset,
-                                    SystemInformation.VirtualScreen.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                    SystemInformation.VirtualScreen.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                    SystemInformation.VirtualScreen.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                    SystemInformation.VirtualScreen.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomRightCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(SystemInformation.VirtualScreen.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    SystemInformation.VirtualScreen.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point(SystemInformation.VirtualScreen.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    SystemInformation.VirtualScreen.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.LeftMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
                                 new Point(SystemInformation.VirtualScreen.Left + settingsINI.LogoProperties.xOffset,
-                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top)/2 - (int)(imageBitmaps[0].Height)/2 + settingsINI.LogoProperties.yOffset),
+                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top)/2 - imageBitmaps[0].Height/2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.CustomPosition:
@@ -558,26 +544,26 @@ namespace CustomDesktopLogo
                             break;
                         case LocationTypes.TopMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
+                                new Point((SystemInformation.VirtualScreen.Right - SystemInformation.VirtualScreen.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
                                     SystemInformation.VirtualScreen.Top + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.TopRightCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(SystemInformation.VirtualScreen.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
+                                new Point(SystemInformation.VirtualScreen.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
                                     SystemInformation.VirtualScreen.Top + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.RightMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(SystemInformation.VirtualScreen.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top)/2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                new Point(SystemInformation.VirtualScreen.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    (SystemInformation.VirtualScreen.Bottom - SystemInformation.VirtualScreen.Top)/2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         default:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(SystemInformation.VirtualScreen.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    SystemInformation.VirtualScreen.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point(SystemInformation.VirtualScreen.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    SystemInformation.VirtualScreen.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                     }
@@ -587,32 +573,32 @@ namespace CustomDesktopLogo
                     {
                         case LocationTypes.Centre:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomLeftCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
                                 new Point(Screen.PrimaryScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                    Screen.PrimaryScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                    Screen.PrimaryScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                    Screen.PrimaryScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                    Screen.PrimaryScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.BottomRightCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(Screen.PrimaryScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    Screen.PrimaryScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point(Screen.PrimaryScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    Screen.PrimaryScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.LeftMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
                                 new Point(Screen.PrimaryScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top)/2 - (int)(imageBitmaps[0].Height)/2 + settingsINI.LogoProperties.yOffset),
+                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top)/2 - imageBitmaps[0].Height/2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.CustomPosition:
@@ -628,32 +614,32 @@ namespace CustomDesktopLogo
                             break;
                         case LocationTypes.TopMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
+                                new Point((Screen.PrimaryScreen.Bounds.Right - Screen.PrimaryScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
                                     Screen.PrimaryScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.TopRightCorner:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(Screen.PrimaryScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
+                                new Point(Screen.PrimaryScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
                                     Screen.PrimaryScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         case LocationTypes.RightMiddle:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(Screen.PrimaryScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top)/2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                new Point(Screen.PrimaryScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    (Screen.PrimaryScreen.Bounds.Bottom - Screen.PrimaryScreen.Bounds.Top)/2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                         default:
                             allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                new Point(Screen.PrimaryScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                    Screen.PrimaryScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                new Point(Screen.PrimaryScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                    Screen.PrimaryScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                 settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                             break;
                     }
                     break;
                 case MultiMonitorDisplayModes.DisplayOnAllButPrimary:
-                    foreach (Screen aScreen in Screen.AllScreens)
+                    foreach (var aScreen in Screen.AllScreens)
                     {
                         if (!aScreen.Primary)
                         {
@@ -661,32 +647,32 @@ namespace CustomDesktopLogo
                             {
                                 case LocationTypes.Centre:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.BottomLeftCorner:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
                                         new Point(aScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                            aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                            aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.BottomMiddle:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                            aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                            aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.BottomRightCorner:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                            aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                        new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                            aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.LeftMiddle:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
                                         new Point(aScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.CustomPosition:
@@ -702,26 +688,26 @@ namespace CustomDesktopLogo
                                     break;
                                 case LocationTypes.TopMiddle:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
+                                        new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
                                             aScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.TopRightCorner:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
+                                        new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
                                             aScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 case LocationTypes.RightMiddle:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                        new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                            (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                                 default:
                                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                        new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                            aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                        new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                            aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                     break;
                             }
@@ -729,38 +715,38 @@ namespace CustomDesktopLogo
                     }
                     break;
                 case MultiMonitorDisplayModes.AllSame:
-                    foreach (Screen aScreen in Screen.AllScreens)
+                    foreach (var aScreen in Screen.AllScreens)
                     {
                         switch (settingsINI.LogoProperties.displayLocation)
                         {
                             case LocationTypes.Centre:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.BottomLeftCorner:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
                                     new Point(aScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                        aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                        aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.BottomMiddle:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
-                                        aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
+                                        aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.BottomRightCorner:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                        aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                    new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                        aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.LeftMiddle:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
                                     new Point(aScreen.Bounds.Left + settingsINI.LogoProperties.xOffset,
-                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.CustomPosition:
@@ -776,26 +762,26 @@ namespace CustomDesktopLogo
                                 break;
                             case LocationTypes.TopMiddle:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - (int)(imageBitmaps[0].Width) / 2 + settingsINI.LogoProperties.xOffset,
+                                    new Point((aScreen.Bounds.Right - aScreen.Bounds.Left) / 2 - imageBitmaps[0].Width / 2 + settingsINI.LogoProperties.xOffset,
                                         aScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.TopRightCorner:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
+                                    new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
                                         aScreen.Bounds.Top + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             case LocationTypes.RightMiddle:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - (int)(imageBitmaps[0].Height) / 2 + settingsINI.LogoProperties.yOffset),
+                                    new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                        (aScreen.Bounds.Bottom - aScreen.Bounds.Top) / 2 - imageBitmaps[0].Height / 2 + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                             default:
                                 allLogos.Add(new LogoObject(imageBitmaps[0], 
-                                    new Point(aScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                                        aScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                                    new Point(aScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                                        aScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                                     settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                                 break;
                         }                 
@@ -803,8 +789,8 @@ namespace CustomDesktopLogo
                     break;
                 default:
                     allLogos.Add(new LogoObject(imageBitmaps[0], 
-                        new Point(Screen.PrimaryScreen.Bounds.Right - (int)(imageBitmaps[0].Width) + settingsINI.LogoProperties.xOffset,
-                            Screen.PrimaryScreen.Bounds.Bottom - (int)(imageBitmaps[0].Height) + settingsINI.LogoProperties.yOffset),
+                        new Point(Screen.PrimaryScreen.Bounds.Right - imageBitmaps[0].Width + settingsINI.LogoProperties.xOffset,
+                            Screen.PrimaryScreen.Bounds.Bottom - imageBitmaps[0].Height + settingsINI.LogoProperties.yOffset),
                         settingsINI.LogoProperties.defaultOpacity, settingsINI.LogoProperties.windowLevel));
                     break;
             }
@@ -812,7 +798,7 @@ namespace CustomDesktopLogo
             hideLogosToolStripMenuItem.Checked = false;
 
             // Set whether the logos respond to input
-            for (int i = 0; allLogos != null && i < allLogos.Count; i++)
+            for (var i = 0; allLogos != null && i < allLogos.Count; i++)
             {
                 try
                 {
@@ -853,7 +839,7 @@ namespace CustomDesktopLogo
             if (isUpdatingLogoGraphics == false)
             {
                 isUpdatingLogoGraphics = true;
-                ThreadPool.QueueUserWorkItem(new WaitCallback(updateLogoGraphics));
+                ThreadPool.QueueUserWorkItem(updateLogoGraphics);
             }
         }
 
@@ -862,7 +848,7 @@ namespace CustomDesktopLogo
             try
             {
                // This method is unsafe for multi-threaded coded
-                for (int i = 0; i < allLogos.Count; i++)
+                for (var i = 0; i < allLogos.Count; i++)
                 {
                     allLogos[i].SetBitmap(true, imageBitmaps[imageBitmapsIndex], true, (byte)settingsINI.LogoProperties.defaultOpacity, false, 0, 0);
                 }
@@ -877,7 +863,7 @@ namespace CustomDesktopLogo
         {
             if (settingsINI.LogoProperties.windowLevel == WindowLevelTypes.AlwaysOnBottom || settingsINI.LogoProperties.windowLevel == WindowLevelTypes.Topmost)
             {
-                for (int i = 0; allLogos != null && i < allLogos.Count; i++)
+                for (var i = 0; allLogos != null && i < allLogos.Count; i++)
                 {
                     try
                     {
@@ -895,30 +881,30 @@ namespace CustomDesktopLogo
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         public void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
             settingsTabControl.Invalidate();
-            this.Show();
-            this.BringToFront();
+            Show();
+            BringToFront();
         }
 
         private void MainFormTrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
             settingsTabControl.Invalidate();
-            this.Show();
-            this.BringToFront();
+            Show();
+            BringToFront();
         }
 
         public void helpAboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutBox HelpAbout = new AboutBox(this);
+            var HelpAbout = new AboutBox(this);
             HelpAbout.Show();
         }
 
@@ -929,31 +915,19 @@ namespace CustomDesktopLogo
 
         public bool useAsDropFolderCheckBoxChecked
         {
-            get
-            {
-                return useAsDropFolderCheckBox.Checked;
-            }
-            set
-            {
-                useAsDropFolderCheckBox.Checked = value;
-            }
+            get => useAsDropFolderCheckBox.Checked;
+            set => useAsDropFolderCheckBox.Checked = value;
         }
 
         public bool disableMovementCheckBoxChecked
         {
-            get
-            {
-                return disableLogoMovementCB.Checked;
-            }
-            set
-            {
-                disableLogoMovementCB.Checked = value;
-            }
+            get => disableLogoMovementCB.Checked;
+            set => disableLogoMovementCB.Checked = value;
         }
 
         public void hideLogosToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (hideLogosToolStripMenuItem.Checked == true)
+            if (hideLogosToolStripMenuItem.Checked)
             {
                 AnimationTimer.Stop();
                 elapsedTime = 0;
@@ -981,23 +955,17 @@ namespace CustomDesktopLogo
 
         public bool hideLogosToolStripMenuItemChecked
         {
-            get
-            {
-                return hideLogosToolStripMenuItem.Checked;
-            }
-            set
-            {
-                hideLogosToolStripMenuItem.Checked = value;
-            }
+            get => hideLogosToolStripMenuItem.Checked;
+            set => hideLogosToolStripMenuItem.Checked = value;
         }
 
         private void hideAllLogos()
         {
-            for (int i = 0; i < allLogos.Count; i++)
+            for (var i = 0; i < allLogos.Count; i++)
             {
                 if (allLogos[i].InvokeRequired)
                 {
-                    ShowHideCallback d = new ShowHideCallback(hideAllLogos);
+                    var d = new ShowHideCallback(hideAllLogos);
                     allLogos[i].Invoke(d, new object[] { });
                 }
                 else
@@ -1010,11 +978,11 @@ namespace CustomDesktopLogo
 
         private void showAllLogos()
         {
-            for (int i = 0; i < allLogos.Count; i++)
+            for (var i = 0; i < allLogos.Count; i++)
             {
                 if (allLogos[i].InvokeRequired)
                 {
-                    ShowHideCallback d = new ShowHideCallback(showAllLogos);
+                    var d = new ShowHideCallback(showAllLogos);
                     allLogos[i].Invoke(d, new object[] { });
                 }
                 else
@@ -1062,10 +1030,10 @@ namespace CustomDesktopLogo
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            if (WindowState == FormWindowState.Minimized)
             {
-                this.Select(true, true);
-                this.Hide();
+                Select(true, true);
+                Hide();
 
                 //if (AnimationTimer.Enabled == false)
                 //    MemoryUtility.ClearUnusedMemory();
@@ -1084,7 +1052,7 @@ namespace CustomDesktopLogo
 
         private void languageFileDialog_FileOk(object sender, CancelEventArgs e)
         {
-            String newLanguagePath;
+            string newLanguagePath;
             if (languageFileDialog.FileName.StartsWith(Application.StartupPath + Path.DirectorySeparatorChar))
             {
                 newLanguagePath = @"." + languageFileDialog.FileName.Substring(Application.StartupPath.Length);
@@ -1103,7 +1071,7 @@ namespace CustomDesktopLogo
         {
             #region Load Language Data from File
 
-            string languagePath = (String)settingsINI.GetEntry("Language", "path");
+            var languagePath = settingsINI.GetEntry("Language", "path");
 
             if (languagePath == null || languagePath.Length <= 0)
             {
@@ -1139,8 +1107,8 @@ namespace CustomDesktopLogo
 
             #endregion
 
-            this.Text = language.general.customDesktopLogo;
-            this.MainFormTrayIcon.Text = language.general.customDesktopLogo;
+            Text = language.general.customDesktopLogo;
+            MainFormTrayIcon.Text = language.general.customDesktopLogo;
 
             quitToolStripMenuItem.Text = language.mainContextMenu.quit;
             helpAboutToolStripMenuItem.Text = language.mainContextMenu.helpabout;
@@ -1212,13 +1180,13 @@ namespace CustomDesktopLogo
         }
 
         // A string used to hold the version identifier of this build
-        public readonly String programVersion = @"2.0";
+        public readonly string programVersion = @"2.0";
 
         public bool LanguageFileIsValid()
         {
-            String[] compatibleProgramVersions = { programVersion };
-            String versionStated = language.languageFile.intendedForProgramVersion.Trim().ToUpper();
-            foreach (String compareVersion in compatibleProgramVersions)
+            string[] compatibleProgramVersions = { programVersion };
+            var versionStated = language.languageFile.intendedForProgramVersion.Trim().ToUpper();
+            foreach (var compareVersion in compatibleProgramVersions)
             {
                 if (compareVersion.Trim().ToUpper() == versionStated)
                     return true;
@@ -1238,7 +1206,7 @@ namespace CustomDesktopLogo
 
             if (TargetFolderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                String NewFilePath;
+                string NewFilePath;
                 if (TargetFolderBrowserDialog.SelectedPath.StartsWith(Application.StartupPath + Path.DirectorySeparatorChar))
                 {
                     NewFilePath = @"." + TargetFolderBrowserDialog.SelectedPath.Substring(Application.StartupPath.Length);
@@ -1264,7 +1232,7 @@ namespace CustomDesktopLogo
 
         private void helpAboutButton_Click(object sender, EventArgs e)
         {
-            AboutBox HelpAbout = new AboutBox(this);
+            var HelpAbout = new AboutBox(this);
             HelpAbout.Show();
         }
 
@@ -1580,7 +1548,7 @@ namespace CustomDesktopLogo
 
             settingsINI.SetEntry("LogoProperties", "scaleImagesFactor", scaleImageFactorTrackBar.Value.ToString());
             settingsINI.LogoProperties.scaleImagesFactor = scaleImageFactorTrackBar.Value;
-            scaleImageFactorValueLabel.Text = ((double)(settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0).ToString();
+            scaleImageFactorValueLabel.Text = ((settingsINI.LogoProperties.scaleImagesFactor + 100) / 100.0).ToString();
 
             scaleImageFactorChanged = true;
         }
@@ -1623,11 +1591,11 @@ namespace CustomDesktopLogo
 
         private void updateLogoOpacity()
         {
-            for (int i = 0; i < allLogos.Count; i++)
+            for (var i = 0; i < allLogos.Count; i++)
             {
                 if (allLogos[i].InvokeRequired)
                 {
-                    UpdateSizeOpacityCallback d = new UpdateSizeOpacityCallback(updateLogoOpacity);
+                    var d = new UpdateSizeOpacityCallback(updateLogoOpacity);
                     allLogos[i].Invoke(d, new object[] { });
                 }
                 else
@@ -1644,22 +1612,22 @@ namespace CustomDesktopLogo
 
         private void sizeTabPage_Click(object sender, EventArgs e)
         {
-            this.Select(true, true);
+            Select(true, true);
         }
 
         #endregion
 
         public void filePathToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ToolStripMenuItem sendToolStripMenuItem = (ToolStripMenuItem)sender;
+            var sendToolStripMenuItem = (ToolStripMenuItem)sender;
 
-            if (System.IO.Directory.Exists((String)sendToolStripMenuItem.Tag))
+            if (Directory.Exists((string)sendToolStripMenuItem.Tag))
             {
                 if (action == FileLocationActions.Open)
                 {
                     try
                     {
-                        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo((String)sendToolStripMenuItem.Tag);
+                        var startInfo = new ProcessStartInfo((string)sendToolStripMenuItem.Tag);
                         //startInfo.WindowStyle = ProcessWindowStyle.Normal;
                         //startInfo.Arguments = argsParams;
                         startInfo.CreateNoWindow = false;
@@ -1676,7 +1644,7 @@ namespace CustomDesktopLogo
 
                         startInfo.UseShellExecute = true;
 
-                        System.Diagnostics.Process.Start(startInfo);
+                        Process.Start(startInfo);
                     }
                     catch (Exception ee1)
                     {
@@ -1684,14 +1652,14 @@ namespace CustomDesktopLogo
                 }
                 else
                 {
-                    moveCopyFiles performActionOnFiles = new moveCopyFiles(files, (String)sendToolStripMenuItem.Tag, action);
-                    Thread performAction = new Thread(new ThreadStart(performActionOnFiles.performAction));
+                    var performActionOnFiles = new moveCopyFiles(files, (string)sendToolStripMenuItem.Tag, action);
+                    var performAction = new Thread(performActionOnFiles.performAction);
                     performAction.Start();
                 }
             }
             else
             {
-                MessageBox.Show((String)sendToolStripMenuItem.Tag + @" :" + @language.errorMessages.folderDoesNotExist, language.errorMessages.customDesktopLogo);
+                MessageBox.Show((string)sendToolStripMenuItem.Tag + @" :" + language.errorMessages.folderDoesNotExist, language.errorMessages.customDesktopLogo);
             }
         }
 
@@ -1704,7 +1672,7 @@ namespace CustomDesktopLogo
             settingsINI.SetEntry("FolderPaths", "useAsDropFolder", useAsDropFolderCheckBox.Checked.ToString());
 
             // Set whether the logos respond to input
-            for (int i = 0; allLogos != null && i < allLogos.Count; i++)
+            for (var i = 0; allLogos != null && i < allLogos.Count; i++)
             {
                 try
                 {
@@ -1724,10 +1692,10 @@ namespace CustomDesktopLogo
             settingsINI.SetEntry("LogoProperties", "disableMovement", disableLogoMovementCB.Checked.ToString());
         }
 
-        String[] files = { };
+        string[] files = { };
         FileLocationActions action = FileLocationActions.Copy;
 
-        public void moveCopyToFilePathOptions(LogoObject sender, String[] filesList, FileLocationActions fileAction)
+        public void moveCopyToFilePathOptions(LogoObject sender, string[] filesList, FileLocationActions fileAction)
         {
             files = filesList;
             action = fileAction;
@@ -1737,28 +1705,28 @@ namespace CustomDesktopLogo
             sender.showContextMenu();
         }
 
-        public void addTargetFolder(String[] newTargetFolders)
+        public void addTargetFolder(string[] newTargetFolders)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+            Show();
+            WindowState = FormWindowState.Normal;
             settingsTabControl.Invalidate();
             settingsTabControl.SelectedTab = dropFolderTab;
-            this.BringToFront();
+            BringToFront();
 
-            int index = 0;
+            var index = 0;
 
             while (index < newTargetFolders.Length && !Directory.Exists(newTargetFolders[index]))
             {
                 index++;
             }
 
-            for (int i = 0; i < filePathsDataGridView.RowCount && index < newTargetFolders.Length; i++)
+            for (var i = 0; i < filePathsDataGridView.RowCount && index < newTargetFolders.Length; i++)
             {
                 if ((filePathsDataGridView[0, i].Value == null || filePathsDataGridView[0, i].Value.ToString().Length <= 0) &&
                     (filePathsDataGridView[1, i].Value == null || filePathsDataGridView[1, i].Value.ToString().Length <= 0))
                 {
                     filePathsDataGridView[1, i].Value = newTargetFolders[index];
-                    DataGridViewCellEventArgs e = new DataGridViewCellEventArgs(1, i);
+                    var e = new DataGridViewCellEventArgs(1, i);
                     filePathsDataGridView_RowValidated(this, e);
                     index++;
 
@@ -1783,16 +1751,16 @@ namespace CustomDesktopLogo
 
         private void filePathsContextMenuStrip_Opening(object sender, CancelEventArgs e)
         {
-            populateFilePathsContextMenuStrip(this.filePathsContextMenuStrip, action);
+            populateFilePathsContextMenuStrip(filePathsContextMenuStrip, action);
         }
 
         public void populateFilePathsContextMenuStrip(ContextMenuStrip aFilePathsContextMenuStrip, FileLocationActions fileAction)
         {
             aFilePathsContextMenuStrip.Items.Clear();
 
-            ToolStripMenuItem copyMoveToolStripMenuItem = new ToolStripMenuItem();
+            var copyMoveToolStripMenuItem = new ToolStripMenuItem();
             copyMoveToolStripMenuItem.Name = "newToolStripMenuItem";
-            copyMoveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            copyMoveToolStripMenuItem.Size = new Size(152, 22);
 
             if (action == FileLocationActions.Copy)
                 copyMoveToolStripMenuItem.Text = @"Copy To";
@@ -1802,21 +1770,21 @@ namespace CustomDesktopLogo
                 copyMoveToolStripMenuItem.Text = @"Open";
 
             copyMoveToolStripMenuItem.Enabled = false;
-            copyMoveToolStripMenuItem.Font = new Font(FontFamily.GenericSansSerif, (float)12, FontStyle.Bold);
+            copyMoveToolStripMenuItem.Font = new Font(FontFamily.GenericSansSerif, 12, FontStyle.Bold);
 
             aFilePathsContextMenuStrip.Items.Add(copyMoveToolStripMenuItem);
 
 
-            for (int i = 0; i < settingsINI.FolderPaths.folderPaths.Count; i++)
+            for (var i = 0; i < settingsINI.FolderPaths.folderPaths.Count; i++)
             {
-                String folderPath = settingsINI.FolderPaths.folderPaths[i].path;
-                String displayName = settingsINI.FolderPaths.folderPaths[i].displayName;
+                var folderPath = settingsINI.FolderPaths.folderPaths[i].path;
+                var displayName = settingsINI.FolderPaths.folderPaths[i].displayName;
 
                 if (folderPath != null && folderPath.Length > 0)
                 {
-                    ToolStripMenuItem newToolStripMenuItem = new ToolStripMenuItem();
+                    var newToolStripMenuItem = new ToolStripMenuItem();
                     newToolStripMenuItem.Name = "newToolStripMenuItem";
-                    newToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+                    newToolStripMenuItem.Size = new Size(152, 22);
 
                     if (displayName != null && displayName.Length > 0)
                         newToolStripMenuItem.Text = displayName;
@@ -1825,7 +1793,7 @@ namespace CustomDesktopLogo
 
                     newToolStripMenuItem.Tag = folderPath;
 
-                    newToolStripMenuItem.Click += new System.EventHandler(this.filePathToolStripMenuItem_Click);
+                    newToolStripMenuItem.Click += filePathToolStripMenuItem_Click;
                     aFilePathsContextMenuStrip.Items.Add(newToolStripMenuItem);
                 }
             }
@@ -1835,7 +1803,7 @@ namespace CustomDesktopLogo
         {
             if (e.ColumnIndex == 2)
             {
-                folderPathsFolderBrowserDialog.SelectedPath = (String)filePathsDataGridView[1, e.RowIndex].Value;
+                folderPathsFolderBrowserDialog.SelectedPath = (string)filePathsDataGridView[1, e.RowIndex].Value;
 
                 if (folderPathsFolderBrowserDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -1865,27 +1833,27 @@ namespace CustomDesktopLogo
 
             //Console.WriteLine("Row Index: " + e.RowIndex + filePathsDataGridView[0, e.RowIndex].Value.ToString());
 
-            String theSection = @"FolderPaths";
-            settingsINI.SetEntry(theSection, e.RowIndex.ToString() + @"-FolderPath", filePathsDataGridView[1, e.RowIndex].Value.ToString());
-            settingsINI.SetEntry(theSection, e.RowIndex.ToString() + @"-DisplayName", filePathsDataGridView[0, e.RowIndex].Value.ToString());
+            var theSection = @"FolderPaths";
+            settingsINI.SetEntry(theSection, e.RowIndex + @"-FolderPath", filePathsDataGridView[1, e.RowIndex].Value.ToString());
+            settingsINI.SetEntry(theSection, e.RowIndex + @"-DisplayName", filePathsDataGridView[0, e.RowIndex].Value.ToString());
 
-            SettingsInformation.FolderPathItem newFolderPathItem = new SettingsInformation.FolderPathItem();
-            newFolderPathItem.path = settingsINI.GetEntry(theSection, e.RowIndex.ToString() + @"-FolderPath");
-            newFolderPathItem.displayName = settingsINI.GetEntry(theSection, e.RowIndex.ToString() + @"-DisplayName");
+            var newFolderPathItem = new SettingsInformation.FolderPathItem();
+            newFolderPathItem.path = settingsINI.GetEntry(theSection, e.RowIndex + @"-FolderPath");
+            newFolderPathItem.displayName = settingsINI.GetEntry(theSection, e.RowIndex + @"-DisplayName");
             settingsINI.FolderPaths.folderPaths[e.RowIndex] = newFolderPathItem;
         }
     }
 
     public class moveCopyFiles
     {
-        String[] files = { };
-        String destinationFolder = "";
+        string[] files = { };
+        string destinationFolder = "";
         FileLocationActions action = FileLocationActions.Copy;
 
-        public moveCopyFiles(String[] filesList, String destination, FileLocationActions fileAction)
+        public moveCopyFiles(string[] filesList, string destination, FileLocationActions fileAction)
         {
-            files = (String[])filesList.Clone();
-            destinationFolder = (String)destination.Clone();
+            files = (string[])filesList.Clone();
+            destinationFolder = (string)destination.Clone();
             action = fileAction;
         }
 
@@ -1895,8 +1863,8 @@ namespace CustomDesktopLogo
 
             if (action == FileLocationActions.Copy)
             {
-                StringBuilder filesString = new StringBuilder();
-                for (int i = 0; i < files.Length; i++)
+                var filesString = new StringBuilder();
+                for (var i = 0; i < files.Length; i++)
                 {
                     filesString.Append(files[i] + '\0');
                     
@@ -1921,8 +1889,8 @@ namespace CustomDesktopLogo
             }
             else
             {
-                StringBuilder filesString = new StringBuilder();
-                for (int i = 0; i < files.Length; i++)
+                var filesString = new StringBuilder();
+                for (var i = 0; i < files.Length; i++)
                 {
                     filesString.Append(files[i] + '\0');
                     
@@ -1953,7 +1921,7 @@ namespace CustomDesktopLogo
         public void copyDirectory(string Src, string Dst)
         {
             //Application.DoEvents();
-            String[] Files;
+            string[] Files;
 
             if (Dst[Dst.Length - 1] != Path.DirectorySeparatorChar) Dst += Path.DirectorySeparatorChar;
             if (!Directory.Exists(Dst))
@@ -1968,7 +1936,7 @@ namespace CustomDesktopLogo
                 }
             }
             Files = Directory.GetFileSystemEntries(Src);
-            foreach (string Element in Files)
+            foreach (var Element in Files)
             {
                 // Sub directories
                 if (Directory.Exists(Element))
@@ -1994,7 +1962,7 @@ namespace CustomDesktopLogo
         public void moveDirectory(string Src, string Dst)
         {
             //Application.DoEvents();
-            String[] Files;
+            string[] Files;
 
             if (Dst[Dst.Length - 1] != Path.DirectorySeparatorChar) Dst += Path.DirectorySeparatorChar;
             if (!Directory.Exists(Dst))
@@ -2009,7 +1977,7 @@ namespace CustomDesktopLogo
                 }
             }
             Files = Directory.GetFileSystemEntries(Src);
-            foreach (string Element in Files)
+            foreach (var Element in Files)
             {
                 // Sub directories
                 if (Directory.Exists(Element))
@@ -2042,7 +2010,7 @@ namespace CustomDesktopLogo
         {
             try
             {         
-                Pinvoke.Win32.SHFILEOPSTRUCT _ShFile = new Pinvoke.Win32.SHFILEOPSTRUCT();
+                var _ShFile = new Pinvoke.Win32.SHFILEOPSTRUCT();
                 _ShFile.wFunc = Pinvoke.Win32.FO_Func.FO_COPY;
                 _ShFile.fFlags = (ushort)Pinvoke.Win32.FO_Func.FOF_ALLOWUNDO;
                 _ShFile.pFrom = sSource;
@@ -2051,7 +2019,7 @@ namespace CustomDesktopLogo
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message);            
+                MessageBox.Show(ex.Message);            
             }         
         }
 
@@ -2065,7 +2033,7 @@ namespace CustomDesktopLogo
         {
             try
             {
-                Pinvoke.Win32.SHFILEOPSTRUCT _ShFile = new Pinvoke.Win32.SHFILEOPSTRUCT();
+                var _ShFile = new Pinvoke.Win32.SHFILEOPSTRUCT();
                 _ShFile.wFunc = Pinvoke.Win32.FO_Func.FO_MOVE;
                 _ShFile.fFlags = (ushort)Pinvoke.Win32.FO_Func.FOF_ALLOWUNDO;
                 _ShFile.pFrom = sSource;
@@ -2074,7 +2042,7 @@ namespace CustomDesktopLogo
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
             }
         }
     }

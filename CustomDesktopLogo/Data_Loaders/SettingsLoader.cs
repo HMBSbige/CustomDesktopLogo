@@ -7,17 +7,11 @@
 // to allow for high legibility for the end user.
 
 using System;
-using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Collections;
-using System.Text;
-using System.Drawing;
-using System.IO;
 using System.ComponentModel;
-
-using AMS.Profile;      // Allows for .ini file manipulation
-using SettingsInformation;
+using AMS.Profile;
 using CustomDesktopLogo;
+using SettingsInformation; // Allows for .ini file manipulation
 
 namespace SettingsLoader
 {
@@ -33,13 +27,13 @@ namespace SettingsLoader
         /// Allows for .ini file manipulation.
         /// </summary>  
         private Profile SettingsINI;
-        private String DataVerifier;
+        private string DataVerifier;
 
-        public SettingsInformation.LogoProperties LogoProperties = new LogoProperties();
-        public SettingsInformation.Language Language = new Language();
-        public SettingsInformation.General General = new General();
-        public SettingsInformation.GeneralAnimation GeneralAnimation = new GeneralAnimation();
-        public SettingsInformation.FolderPaths FolderPaths = new FolderPaths();
+        public LogoProperties LogoProperties;
+        public Language Language;
+        public General General;
+        public GeneralAnimation GeneralAnimation;
+        public FolderPaths FolderPaths;
 
         #endregion
 
@@ -53,7 +47,7 @@ namespace SettingsLoader
         /// This class is independent of the file version of the .ini file. Bounds checking and automatic repair are done.
         /// </summary>        
         /// <param name="FilePath">System path to the .ini file to where the global settings are stored.</param>        
-        public SettingsLoader(String FilePath)
+        public SettingsLoader(string FilePath)
         {
             SettingsINI = new Ini(FilePath);
 
@@ -80,11 +74,11 @@ namespace SettingsLoader
         /// </summary>        
         public void InitializeSettingsInfoStructs()
         {
-            LogoProperties = new SettingsInformation.LogoProperties();
-            Language = new SettingsInformation.Language();
-            General = new SettingsInformation.General();
-            GeneralAnimation = new SettingsInformation.GeneralAnimation();
-            FolderPaths = new SettingsInformation.FolderPaths();
+            LogoProperties = new LogoProperties();
+            Language = new Language();
+            General = new General();
+            GeneralAnimation = new GeneralAnimation();
+            FolderPaths = new FolderPaths();
         }
 
         /// <summary>        
@@ -106,16 +100,16 @@ namespace SettingsLoader
         /// </summary>        
         /// <param name="Section">The section in the .ini file to look at.</param>        
         /// <returns>A string representing the setting value or null if not found.</returns> 
-        public String GetEntry(String Section, String EntryName)
+        public string GetEntry(string Section, string EntryName)
         {
-            return (String)SettingsINI.GetValue(Section, EntryName);
+            return (string)SettingsINI.GetValue(Section, EntryName);
         }
 
         /// <summary>        
         /// Retrieves all the section names in the settings file.
         /// </summary>               
         /// <returns>A string array containing the section names null if not found.</returns> 
-        public String[] GetSectionNames()
+        public string[] GetSectionNames()
         {
             return SettingsINI.GetSectionNames();
         }
@@ -125,7 +119,7 @@ namespace SettingsLoader
         /// </summary>        
         /// <param name="Section">The section in the .ini file to look at.</param>        
         /// <returns>A string array containing all the entry names in the given section or null if not found.</returns> 
-        public String[] GetEntryNames(String Section)
+        public string[] GetEntryNames(string Section)
         {
             return SettingsINI.GetEntryNames(Section);
         }
@@ -136,7 +130,7 @@ namespace SettingsLoader
         /// <param name="Section">The section in the .ini file to write to. It is created if not found.</param>  
         /// <param name="EntryName">The entry name to store the setting value under. It is created if not found.</param>
         /// <param name="Value">A string representing the value to be stored.</param>
-        public void SetEntry(String Section, String EntryName, String Value)
+        public void SetEntry(string Section, string EntryName, string Value)
         {
             SettingsINI.SetValue(Section, EntryName, Value);
         }
@@ -146,7 +140,7 @@ namespace SettingsLoader
         /// </summary>        
         /// <param name="Section">The section in the .ini file to search in.</param>  
         /// <param name="EntryName">The entry to remove.</param>
-        public void RemoveEntry(String Section, String EntryName)
+        public void RemoveEntry(string Section, string EntryName)
         {
             SettingsINI.RemoveEntry(Section, EntryName);
         }
@@ -155,7 +149,7 @@ namespace SettingsLoader
         /// Removes an entire section from the settings file, including the entries.
         /// </summary>        
         /// <param name="Section">The section in the .ini file to remove.</param>  
-        public void RemoveSection(String Section)
+        public void RemoveSection(string Section)
         {
             SettingsINI.RemoveSection(Section);
         }
@@ -166,7 +160,7 @@ namespace SettingsLoader
 
         private void LoadLogoProperties()
         {
-            const String theSection = "LogoProperties";
+            const string theSection = "LogoProperties";
 
             #region path
 
@@ -253,7 +247,7 @@ namespace SettingsLoader
 
             #region windowLevel
 
-            TypeConverter windowLevelConverter = TypeDescriptor.GetConverter(typeof(WindowLevelTypes));
+            var windowLevelConverter = TypeDescriptor.GetConverter(typeof(WindowLevelTypes));
 
             DataVerifier = null;
             DataVerifier = GetEntry(theSection, "windowLevel");
@@ -278,7 +272,7 @@ namespace SettingsLoader
 
             #region multiMonitorDisplayMode
 
-            TypeConverter multiMonitorDisplayModeConverter = TypeDescriptor.GetConverter(typeof(MultiMonitorDisplayModes));
+            var multiMonitorDisplayModeConverter = TypeDescriptor.GetConverter(typeof(MultiMonitorDisplayModes));
 
             DataVerifier = null;
             DataVerifier = GetEntry(theSection, "multiMonitorDisplayMode");
@@ -303,7 +297,7 @@ namespace SettingsLoader
 
             #region displayLocation
 
-            TypeConverter displayLocationConverter = TypeDescriptor.GetConverter(typeof(LocationTypes));
+            var displayLocationConverter = TypeDescriptor.GetConverter(typeof(LocationTypes));
 
             DataVerifier = null;
             DataVerifier = GetEntry(theSection, "displayLocation");
@@ -399,7 +393,7 @@ namespace SettingsLoader
 
         private void LoadLanguage()
         {
-            const String theSection = "Language";
+            const string theSection = "Language";
 
             #region Path
 
@@ -420,12 +414,12 @@ namespace SettingsLoader
 
         private void LoadGeneral()
         {
-            const String theSection = "General";
+            const string theSection = "General";
         }
 
         private void LoadGeneralAnimation()
         {
-            const String theSection = "GeneralAnimation";
+            const string theSection = "GeneralAnimation";
 
             #region framesPerSecond
 
@@ -477,11 +471,11 @@ namespace SettingsLoader
 
         private void LoadFolderPaths()
         {
-            const String theSection = "FolderPaths";
+            const string theSection = "FolderPaths";
             FolderPaths.folderPaths = new List<FolderPathItem>();
 
-            int numFolderPaths = 20;
-            String DataVerifier;
+            var numFolderPaths = 20;
+            string DataVerifier;
 
             #region Use as drop folder
 
@@ -509,34 +503,34 @@ namespace SettingsLoader
             // Ensure data integrity
             if (!SettingsINI.HasSection(theSection))
             {
-                for (int i = 0; i < numFolderPaths; i++)
+                for (var i = 0; i < numFolderPaths; i++)
                 {
-                    SetEntry(theSection, i.ToString() + @"-FolderPath", "");
-                    SetEntry(theSection, i.ToString() + @"-DisplayName", "");
+                    SetEntry(theSection, i + @"-FolderPath", "");
+                    SetEntry(theSection, i + @"-DisplayName", "");
                 }
             }
             else
             {
-                for (int i = 0; i < numFolderPaths; i++)
+                for (var i = 0; i < numFolderPaths; i++)
                 {
-                    if (!SettingsINI.HasEntry(theSection, i.ToString() + @"-FolderPath"))
+                    if (!SettingsINI.HasEntry(theSection, i + @"-FolderPath"))
                     {
-                        SetEntry(theSection, i.ToString() + @"-FolderPath", "");
+                        SetEntry(theSection, i + @"-FolderPath", "");
                     }
 
-                    if (!SettingsINI.HasEntry(theSection, i.ToString() + @"-DisplayName"))
+                    if (!SettingsINI.HasEntry(theSection, i + @"-DisplayName"))
                     {
-                        SetEntry(theSection, i.ToString() + @"-DisplayName", "");
+                        SetEntry(theSection, i + @"-DisplayName", "");
                     }
                 }
             }
 
 
-            for (int i = 0; i < numFolderPaths; i++)
+            for (var i = 0; i < numFolderPaths; i++)
             {
-                FolderPathItem newFolderPathItem = new FolderPathItem();
-                newFolderPathItem.path = GetEntry(theSection, i.ToString() + @"-FolderPath");
-                newFolderPathItem.displayName = GetEntry(theSection, i.ToString() + @"-DisplayName");
+                var newFolderPathItem = new FolderPathItem();
+                newFolderPathItem.path = GetEntry(theSection, i + @"-FolderPath");
+                newFolderPathItem.displayName = GetEntry(theSection, i + @"-DisplayName");
                 FolderPaths.folderPaths.Add(newFolderPathItem);
             }
             

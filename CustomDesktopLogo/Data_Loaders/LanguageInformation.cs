@@ -19,21 +19,14 @@
 
 // This file contains the structs used to language data for display.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Text;
-
 namespace LanguageInformation
 {
     public struct LanguageFile
     {
-        public String intendedForProgramVersion;
-        public String languageFileVersion;
-        public String languageName;
-        public String fileAuthor;
+        public string intendedForProgramVersion;
+        public string languageFileVersion;
+        public string languageName;
+        public string fileAuthor;
     }
 
     public struct General

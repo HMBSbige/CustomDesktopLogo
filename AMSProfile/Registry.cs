@@ -1,4 +1,4 @@
-/*
+﻿/*
  * AMS.Profile Class Library
  * 
  * Written by Alvaro Mendez
@@ -162,7 +162,7 @@ namespace AMS.Profile
 		{
 			VerifyName();
 			
-			string keyName = Name + "\\" + section;
+			var keyName = Name + "\\" + section;
 
 			if (create)
 				return m_rootKey.CreateSubKey(keyName);
@@ -210,7 +210,7 @@ namespace AMS.Profile
 			if (!RaiseChangeEvent(true, ProfileChangeType.SetValue, section, entry, value))
 				return;
 			
-			using (RegistryKey subKey = GetSubKey(section, true, true))
+			using (var subKey = GetSubKey(section, true, true))
 				subKey.SetValue(entry, value);
 			
 			RaiseChangeEvent(false, ProfileChangeType.SetValue, section, entry, value);
@@ -238,7 +238,7 @@ namespace AMS.Profile
 			VerifyAndAdjustSection(ref section);
 			VerifyAndAdjustEntry(ref entry);
 
-			using (RegistryKey subKey = GetSubKey(section, false, false))
+			using (var subKey = GetSubKey(section, false, false))
 				return (subKey == null ? null : subKey.GetValue(entry));
 		}
 
@@ -269,7 +269,7 @@ namespace AMS.Profile
 			VerifyAndAdjustSection(ref section);
 			VerifyAndAdjustEntry(ref entry);
 			
-			using (RegistryKey subKey = GetSubKey(section, false, true))
+			using (var subKey = GetSubKey(section, false, true))
 			{
 				if (subKey != null && subKey.GetValue(entry) != null)
 				{
@@ -307,7 +307,7 @@ namespace AMS.Profile
 			VerifyName();
 			VerifyAndAdjustSection(ref section);
 			
-			using (RegistryKey key = m_rootKey.OpenSubKey(Name, true))
+			using (var key = m_rootKey.OpenSubKey(Name, true))
 			{
 				if (key != null && HasSection(section))
 				{
@@ -340,7 +340,7 @@ namespace AMS.Profile
 		{
 			VerifyAndAdjustSection(ref section);
 
-			using (RegistryKey subKey = GetSubKey(section, false, false))
+			using (var subKey = GetSubKey(section, false, false))
 			{
 				if (subKey == null)
 					return null;
@@ -364,7 +364,7 @@ namespace AMS.Profile
 		{
 			VerifyName();
 			
-			using (RegistryKey key = m_rootKey.OpenSubKey(Name))
+			using (var key = m_rootKey.OpenSubKey(Name))
 			{
 				if (key == null)
 					return null;				

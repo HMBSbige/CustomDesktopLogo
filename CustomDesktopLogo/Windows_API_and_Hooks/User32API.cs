@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace Pinvoke
@@ -31,7 +31,7 @@ namespace Pinvoke
             FOF_NORECURSION = 0x1000,  // don't recurse into directories.
             FOF_NO_CONNECTED_ELEMENTS = 0x2000,  // don't operate on connected elements.
             FOF_WANTNUKEWARNING = 0x4000,  // during delete operation, warn if nuking instead of recycling (partially overrides FOF_NOCONFIRMATION)
-            FOF_NORECURSEREPARSE = 0x8000,  // treat reparse points as objects, not containe
+            FOF_NORECURSEREPARSE = 0x8000  // treat reparse points as objects, not containe
         }
 
         public struct SHFILEOPSTRUCT
@@ -168,7 +168,7 @@ namespace Pinvoke
         public static extern
             bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
 
-        public enum ShowWindowEnum { Hide = 0, ShowNormal = 1, ShowMinimized = 2, ShowMaximized = 3, Maximize = 3, ShowNormalNoActivate = 4, Show = 5, Minimize = 6, ShowMinNoActivate = 7, ShowNoActivate = 8, Restore = 9, ShowDefault = 10, ForceMinimized = 11 };
+        public enum ShowWindowEnum { Hide = 0, ShowNormal = 1, ShowMinimized = 2, ShowMaximized = 3, Maximize = 3, ShowNormalNoActivate = 4, Show = 5, Minimize = 6, ShowMinNoActivate = 7, ShowNoActivate = 8, Restore = 9, ShowDefault = 10, ForceMinimized = 11 }
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
@@ -227,10 +227,9 @@ namespace Pinvoke
 
         public static IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex)
         {
-            if (IntPtr.Size > 4)
+	        if (IntPtr.Size > 4)
                 return GetClassLongPtr64(hWnd, nIndex);
-            else
-                return new IntPtr(GetClassLongPtr32(hWnd, nIndex));
+	        return new IntPtr(GetClassLongPtr32(hWnd, nIndex));
         }
 
         [DllImport("user32.dll", EntryPoint = "GetClassLong")]
@@ -241,10 +240,9 @@ namespace Pinvoke
 
         public static IntPtr SetClassLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
         {
-            if (IntPtr.Size > 4)
+	        if (IntPtr.Size > 4)
                 return SetClassLongPtr64(hWnd, nIndex, dwNewLong);
-            else
-                return new IntPtr(SetClassLongPtr32(hWnd, nIndex, unchecked((uint)dwNewLong.ToInt32())));
+	        return new IntPtr(SetClassLongPtr32(hWnd, nIndex, unchecked((uint)dwNewLong.ToInt32())));
         }
 
         [DllImport("user32.dll", EntryPoint = "SetClassLong")]
@@ -272,7 +270,7 @@ namespace Pinvoke
             string lpDirectory,
             ShowCommands nShowCmd);
 
-        public enum ShowCommands : int
+        public enum ShowCommands
         {
             SW_HIDE = 0,
             SW_SHOWNORMAL = 1,
