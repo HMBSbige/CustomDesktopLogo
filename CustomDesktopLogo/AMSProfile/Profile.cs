@@ -30,6 +30,7 @@
 
 
 using System;
+using System.Configuration;
 using System.Data;
 
 namespace AMS.Profile
@@ -588,7 +589,8 @@ namespace AMS.Profile
             {
                 try
                 {
-                    var file = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+	                var conf = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                    var file = conf.FilePath;
                     return file.Substring(0, file.LastIndexOf('.'));
                 }
                 catch

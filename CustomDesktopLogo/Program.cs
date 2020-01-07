@@ -44,6 +44,7 @@ namespace CustomDesktopLogo
                 return;
             }
 
+            Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 

@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDesktopLogo", "CustomDesktopLogo\CustomDesktopLogo.csproj", "{64DA47DB-28ED-4B5C-A29B-AAD1BA80EA0E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AMSProfile", "AMSProfile\AMSProfile.csproj", "{29A118C1-7945-47FB-918F-A764571D4C0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomDesktopLogo", "CustomDesktopLogo\CustomDesktopLogo.csproj", "{64DA47DB-28ED-4B5C-A29B-AAD1BA80EA0E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{64DA47DB-28ED-4B5C-A29B-AAD1BA80EA0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64DA47DB-28ED-4B5C-A29B-AAD1BA80EA0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64DA47DB-28ED-4B5C-A29B-AAD1BA80EA0E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{29A118C1-7945-47FB-918F-A764571D4C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29A118C1-7945-47FB-918F-A764571D4C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29A118C1-7945-47FB-918F-A764571D4C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29A118C1-7945-47FB-918F-A764571D4C0F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
